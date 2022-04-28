@@ -1,4 +1,4 @@
-const parseDate = (input) => {
+export const parseDate = (input) => {
   return new Date(input);
 };
 
@@ -12,8 +12,8 @@ export const dayToShow = (date) => {
   return day === today && month === currentMonth
     ? 'Today'
     : day === today + 1 && month === currentMonth
-    ? 'Tomorrow'
-    : day === today - 1 && month === currentMonth
-    ? 'Yesterday'
-    : days[parseDate(date).getDay()];
+      ? 'Tomorrow'
+      : day === today - 1 && month === currentMonth
+        ? 'Yesterday'
+        : days[parseDate(date).getDay()];
 };

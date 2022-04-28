@@ -18,7 +18,7 @@ import {
   VStack,
   Icon,
 } from 'native-base';
-import { dayToShow } from '../utils/day-to-show';
+import { dayToShow, parseDate } from '../utils/day-to-show';
 import { Entypo } from '@expo/vector-icons';
 
 const Game = ({ route, navigation }) => {
@@ -26,10 +26,6 @@ const Game = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { itemId } = route.params;
-
-  const parseDate = (input) => {
-    return new Date(input);
-  };
 
   const fetchGame = () => {
     let obj = {};
@@ -42,14 +38,14 @@ const Game = ({ route, navigation }) => {
             game.data.home_team.id === 13
               ? `https://cdn.statmuse.com/img/nba/teams/nba_los_angeles_clippers_secondary.png`
               : `https://cdn.statmuse.com/img/nba/teams/nba_${game.data.home_team.full_name
-                  .replace(/ /g, '_')
-                  .toLowerCase()}_secondary.png`,
+                .replace(/ /g, '_')
+                .toLowerCase()}_secondary.png`,
           visitor_team_logo:
             game.data.visitor_team.id === 13
               ? `https://cdn.statmuse.com/img/nba/teams/nba_los_angeles_clippers_secondary.png`
               : `https://cdn.statmuse.com/img/nba/teams/nba_${game.data.visitor_team.full_name
-                  .replace(/ /g, '_')
-                  .toLowerCase()}_secondary.png`,
+                .replace(/ /g, '_')
+                .toLowerCase()}_secondary.png`,
         };
         console.log('fetching game', obj);
         setGame(obj);

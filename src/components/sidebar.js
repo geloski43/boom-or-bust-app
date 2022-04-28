@@ -139,7 +139,7 @@ const Sidebar = (props) => {
             />
           ))}
         </HStack>
-        <Text fontSize="11px" fontWeight="extrabold">
+        <Text textAlign={"center"} fontSize="11px" fontWeight="extrabold">
           &copy; {new Date().getFullYear()} Boom or Bust™. All rights reserved.
         </Text>
       </Center>

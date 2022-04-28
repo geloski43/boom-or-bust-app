@@ -20,6 +20,8 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { AntDesign } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
+import { Platform, Modal } from 'react-native';
+import { parseDate } from "../utils/day-to-show"
 
 const GameList = ({
   data,
@@ -37,6 +39,7 @@ const GameList = ({
   setIsPostSeason,
   setPage,
   hasPagination,
+  setShowCalendar
 }) => {
   let progress = Math.round((page / pagesTotal) * 100);
   const navigation = useNavigation();
@@ -56,11 +59,11 @@ const GameList = ({
       >
         <Box my="1" rounded="sm" borderWidth="1" p="2">
           {item.postseason && (
-            <Badge colorScheme="warning" _dark={{ colorScheme: 'warmGray' }}>
+            <Badge alignSelf={"flex-end"} colorScheme="warning" variant={"outline"}>
               Playoffs
             </Badge>
           )}
-          {!item.postseason && <Badge>Regular Season</Badge>}
+          {!item.postseason && <Badge alignSelf={"flex-end"} variant={"outline"}>Regular Season</Badge>}
           <HStack justifyContent="space-between">
             <Stack direction="row">
               <Stack mx="2" direction="column" space={2}>
@@ -140,11 +143,12 @@ const GameList = ({
               mx="2"
               direction="column"
             >
-              <Text alignSelf="flex-end">{item.date.slice(0, 10)}</Text>
+              <Text alignSelf="flex-end">{parseDate(item.date.slice(0, 10)).toLocaleDateString()}</Text>
               <Text
                 alignSelf="flex-end"
                 color="warning.800"
                 fontFamily="Oswald-Regular"
+                _dark={{ color: "warning.400" }}
               >
                 @{item.home_team.city}
               </Text>
@@ -165,22 +169,34 @@ const GameList = ({
               alignItems="center"
               borderRadius="sm"
               bg="blueGray.300"
+              _dark={{ bg: "blueGray.800" }}
               direction="row"
               space={2}
             >
-              <IconButton
-                onPress={showDatepicker}
-                alignSelf="center"
-                _icon={{
-                  as: FontAwesome,
-                  name: 'search',
-                  size: 'sm',
-                  color: 'lightBlue.800',
-                }}
-              />
-              {showCalendar && (
+              {Platform.OS === "android" && (
+                <IconButton
+                  onPress={showDatepicker}
+                  alignSelf="center"
+                  _icon={{
+                    as: FontAwesome,
+                    name: 'search',
+                    size: 'sm',
+                    color: 'lightBlue.800',
+                  }}
+                />
+              )}
+              {showCalendar && Platform.OS === "android" && (
                 <DateTimePicker
                   testID="dateTimePicker"
+                  value={dateToSearch}
+                  mode="date"
+                  display="default"
+                  onChange={onDateChange}
+                />
+              )}
+              {Platform.OS === "ios" && (
+                <DateTimePicker
+                  style={{ width: 74, backgroundColor: "white", }}
                   value={dateToSearch}
                   mode="date"
                   display="default"
@@ -194,6 +210,7 @@ const GameList = ({
               alignItems="center"
               borderRadius="sm"
               bg="blueGray.300"
+              _dark={{ bg: "blueGray.800" }}
               direction="row"
               space={2}
             >
@@ -240,13 +257,14 @@ const GameList = ({
                 }
               >
                 <Text alignSelf="flex-end" fontSize="2xs">
-                  Regular Season
+                  Reg Season
                 </Text>
               </Checkbox>
             </Stack>
             <Stack
-              borderRadius="full"
+              borderRadius="sm"
               bg="blueGray.300"
+              _dark={{ bg: "blueGray.800" }}
               direction="row"
               alignSelf="flex-end"
             >
@@ -299,19 +317,21 @@ const GameList = ({
               alignItems="center"
               borderRadius="sm"
               bg="blueGray.300"
-              mt="1"
+              mt="2"
             >
-              <IconButton
-                onPress={showDatepicker}
-                alignSelf="center"
-                _icon={{
-                  as: FontAwesome,
-                  name: 'search',
-                  size: 'sm',
-                  color: 'lightBlue.800',
-                }}
-              />
-              {showCalendar && (
+              {Platform.OS === "android" && (
+                <IconButton
+                  onPress={showDatepicker}
+                  alignSelf="center"
+                  _icon={{
+                    as: FontAwesome,
+                    name: 'search',
+                    size: 'sm',
+                    color: 'lightBlue.800',
+                  }}
+                />
+              )}
+              {showCalendar && Platform.OS === "android" && (
                 <DateTimePicker
                   testID="dateTimePicker"
                   value={dateToSearch}
@@ -320,8 +340,17 @@ const GameList = ({
                   onChange={onDateChange}
                 />
               )}
+              {Platform.OS === "ios" && (
+                <DateTimePicker
+                  style={{ width: 74, backgroundColor: "white", }}
+                  value={dateToSearch}
+                  mode="date"
+                  display="default"
+                  onChange={onDateChange}
+                />
+              )}
             </Stack>
-            <Stack mt="2" p="2" borderRadius="md" bg="blueGray.300">
+            <Stack _dark={{ bg: "blueGray.800" }} mt="2" p="2" borderRadius="md" bg="blueGray.300">
               <Text>Games on {dateToSearch.toLocaleDateString()}</Text>
             </Stack>
           </Stack>
@@ -378,7 +407,7 @@ const GameList = ({
         itemHeight={95}
         keyExtractor={(item) => item.id.toString()}
       />
-      {isFetchingMore && <Spinner size="lg" my="2" color="warning.500" />}
+      {isFetchingMore && <Spinner size="lg" my="2" color="warning.500" pb="4" />}
     </>
   );
 };

@@ -29,14 +29,14 @@ const Games = ({ navigation }) => {
             obj.home_team.id === 13
               ? `https://cdn.statmuse.com/img/nba/teams/nba_los_angeles_clippers_secondary.png`
               : `https://cdn.statmuse.com/img/nba/teams/nba_${obj.home_team.full_name
-                  .replace(/ /g, '_')
-                  .toLowerCase()}_secondary.png`,
+                .replace(/ /g, '_')
+                .toLowerCase()}_secondary.png`,
           visitor_team_logo:
             obj.visitor_team.id === 13
               ? `https://cdn.statmuse.com/img/nba/teams/nba_los_angeles_clippers_secondary.png`
               : `https://cdn.statmuse.com/img/nba/teams/nba_${obj.visitor_team.full_name
-                  .replace(/ /g, '_')
-                  .toLowerCase()}_secondary.png`,
+                .replace(/ /g, '_')
+                .toLowerCase()}_secondary.png`,
         }));
         totalPages = res.data.meta.total_pages;
         setPagesTotal(totalPages);
@@ -90,14 +90,14 @@ const Games = ({ navigation }) => {
                 obj.home_team.id === 13
                   ? `https://cdn.statmuse.com/img/nba/teams/nba_los_angeles_clippers_secondary.png`
                   : `https://cdn.statmuse.com/img/nba/teams/nba_${obj.home_team.full_name
-                      .replace(/ /g, '_')
-                      .toLowerCase()}_secondary.png`,
+                    .replace(/ /g, '_')
+                    .toLowerCase()}_secondary.png`,
               visitor_team_logo:
                 obj.visitor_team.id === 13
                   ? `https://cdn.statmuse.com/img/nba/teams/nba_los_angeles_clippers_secondary.png`
                   : `https://cdn.statmuse.com/img/nba/teams/nba_${obj.visitor_team.full_name
-                      .replace(/ /g, '_')
-                      .toLowerCase()}_secondary.png`,
+                    .replace(/ /g, '_')
+                    .toLowerCase()}_secondary.png`,
             }));
             setPagesTotal(totalPages);
             setGames(arr);
@@ -131,14 +131,14 @@ const Games = ({ navigation }) => {
             obj.home_team.id === 13
               ? `https://cdn.statmuse.com/img/nba/teams/nba_los_angeles_clippers_secondary.png`
               : `https://cdn.statmuse.com/img/nba/teams/nba_${obj.home_team.full_name
-                  .replace(/ /g, '_')
-                  .toLowerCase()}_secondary.png`,
+                .replace(/ /g, '_')
+                .toLowerCase()}_secondary.png`,
           visitor_team_logo:
             obj.visitor_team.id === 13
               ? `https://cdn.statmuse.com/img/nba/teams/nba_los_angeles_clippers_secondary.png`
               : `https://cdn.statmuse.com/img/nba/teams/nba_${obj.visitor_team.full_name
-                  .replace(/ /g, '_')
-                  .toLowerCase()}_secondary.png`,
+                .replace(/ /g, '_')
+                .toLowerCase()}_secondary.png`,
         }));
         setPage(currentPage);
         setGames([...games, ...arr]);
@@ -174,6 +174,7 @@ const Games = ({ navigation }) => {
           fetchMore={fetchMore}
           fetchGames={fetchGames}
           data={games}
+          setShowCalendar={setShowCalendar}
         />
       ) : (
         Array.from(Array(7).keys()).map((v, i) => (
