@@ -12,6 +12,7 @@ const NavBar = ({ title }) => {
   return (
     <HStack w="full" h={40} alignItems="center" mt="2" p={3} space={10}>
       <IconButton
+        bg="warning.500"
         variant={'solid'}
         onPress={() => {
           handlePressMenuButton();

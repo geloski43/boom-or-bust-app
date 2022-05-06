@@ -6,12 +6,16 @@ import Stats from './screens/stats';
 import Team from './screens/team';
 import Sidebar from './components/sidebar';
 import Game from './screens/game';
+import Players from './screens/players';
+import Player from './screens/player';
 
 const Drawer = createDrawerNavigator();
 
-const App = () => {
+const Navigator = () => {
   return (
     <Drawer.Navigator
+      // prevents drawer from re-opening after navigating to new screen
+      useLegacyImplementation={true}
       initialRouteName="Games"
       drawerContent={(props) => <Sidebar {...props} />}
       screenOptions={{
@@ -24,8 +28,10 @@ const App = () => {
       <Drawer.Screen name="Game" component={Game} />
       <Drawer.Screen name="Teams" component={Teams} />
       <Drawer.Screen name="Team" component={Team} />
+      <Drawer.Screen name="Players" component={Players} />
+      <Drawer.Screen name="Player" component={Player} />
     </Drawer.Navigator>
   );
 };
 
-export default App;
+export default Navigator;

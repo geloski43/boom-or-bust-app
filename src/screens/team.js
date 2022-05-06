@@ -15,6 +15,8 @@ const Team = ({ route, navigation }) => {
   const { itemId, itemName } = route.params;
 
   const fetchTeam = () => {
+    if (!itemId) return;
+    console.log('fetching team');
     setIsLoading(true);
     let basic = {};
     getTeam(itemId)
@@ -22,7 +24,7 @@ const Team = ({ route, navigation }) => {
         const matchedLogo = teamsLogo.find((logo) => logo.id === team.data.id);
         basic = { ...team.data, logo: matchedLogo.logo };
         setTeamBasicInfo(basic);
-        console.log('fetching team', basic);
+        // console.log('fetching team', basic);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -32,12 +34,14 @@ const Team = ({ route, navigation }) => {
   };
 
   const fetchInfo = () => {
+    if (!itemName) return;
+    console.log('fetching team info');
     setIsLoading(true);
     getInfo(itemName)
       .then((response) => response.json())
       .then((data) => {
         setTeamDetailedInfo(data.Infobox.content);
-        console.log('team info', data.Infobox.content);
+        // console.log('team info', data.Infobox.content);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -51,15 +55,29 @@ const Team = ({ route, navigation }) => {
     fetchInfo();
   }, [itemId, itemName]);
 
+  // we add a listener (blur) as the user leaves the screen
+  // we will clear the state and route params so when the user navigates back
+  // it wont show the previous data if different item is clicked
+  useEffect(() => {
+    const clearState = navigation.addListener('blur', () => {
+      setTeamBasicInfo({});
+      setTeamDetailedInfo([]);
+      // run setParams to clear the route params so useEffect will run again if the same item is clicked
+      navigation.setParams({ itemId: null, itemName: null });
+    });
+    return clearState;
+  }, [navigation]);
+
   return (
     <ScreenContainer title={'Team'} navigation={navigation} image={bballCourt}>
       {!isLoading ? (
         <TeamProfile
           teamBasicInfo={teamBasicInfo}
           teamDetailedInfo={teamDetailedInfo}
+          navigation={navigation}
         />
       ) : (
-        <Box flex={1} my="5" alignItems="center">
+        <Box mt="10" alignItems="center">
           <VStack
             w="90%"
             maxW="400"
@@ -86,7 +104,7 @@ const Team = ({ route, navigation }) => {
               <Skeleton.Text mx="4" mb="4" lines={1} w="24" />
             </VStack>
 
-            <Skeleton h="xs" />
+            <Skeleton h="394px" />
           </VStack>
         </Box>
       )}

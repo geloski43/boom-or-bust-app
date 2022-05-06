@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useContext } from 'react';
 import {
   Skeleton,
   HStack,
@@ -12,6 +12,7 @@ import {
   ZStack,
   Checkbox,
   IconButton,
+  Icon,
 } from 'native-base';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
@@ -20,8 +21,11 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { AntDesign } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
-import { Platform, Modal } from 'react-native';
-import { parseDate } from "../utils/day-to-show"
+import { Platform } from 'react-native';
+import { parseDate } from '../utils/day-to-show';
+import { Context as LocalizationContext } from '../context/localization-context';
+import { EvilIcons } from '@expo/vector-icons';
+import { Dimensions } from 'react-native';
 
 const GameList = ({
   data,
@@ -39,8 +43,13 @@ const GameList = ({
   setIsPostSeason,
   setPage,
   hasPagination,
-  setShowCalendar
+  initialMount,
 }) => {
+  const localeContext = useContext(LocalizationContext);
+  const timeZone = localeContext.state.timezoneName;
+
+  const width = Dimensions.get('window').width;
+
   let progress = Math.round((page / pagesTotal) * 100);
   const navigation = useNavigation();
 
@@ -59,11 +68,19 @@ const GameList = ({
       >
         <Box my="1" rounded="sm" borderWidth="1" p="2">
           {item.postseason && (
-            <Badge alignSelf={"flex-end"} colorScheme="warning" variant={"outline"}>
+            <Badge
+              alignSelf={'center'}
+              colorScheme="warning"
+              variant={'outline'}
+            >
               Playoffs
             </Badge>
           )}
-          {!item.postseason && <Badge alignSelf={"flex-end"} variant={"outline"}>Regular Season</Badge>}
+          {!item.postseason && (
+            <Badge alignSelf={'center'} variant={'outline'}>
+              Regular Season
+            </Badge>
+          )}
           <HStack justifyContent="space-between">
             <Stack direction="row">
               <Stack mx="2" direction="column" space={2}>
@@ -132,7 +149,13 @@ const GameList = ({
                 mx="2"
                 direction="column"
               >
-                <Text>{item.status}</Text>
+                {item.status && item.status !== 'Final' ? (
+                  <Text>{`${item.status.slice(0, 5)}${
+                    item.status.includes('PM') ? 'AM' : 'PM'
+                  }`}</Text>
+                ) : (
+                  <Text>{item.status}</Text>
+                )}
                 <Text>{item.time}</Text>
               </Stack>
             </Stack>
@@ -143,12 +166,21 @@ const GameList = ({
               mx="2"
               direction="column"
             >
-              <Text alignSelf="flex-end">{parseDate(item.date.slice(0, 10)).toLocaleDateString()}</Text>
+              {timeZone.includes('Asia') ? (
+                <Text alignSelf="flex-end">
+                  {item.phDate.toLocaleDateString()}
+                </Text>
+              ) : (
+                <Text alignSelf="flex-end">
+                  {parseDate(item.date.slice(0, 10)).toLocaleDateString()}
+                </Text>
+              )}
+
               <Text
                 alignSelf="flex-end"
                 color="warning.800"
                 fontFamily="Oswald-Regular"
-                _dark={{ color: "warning.400" }}
+                _dark={{ color: 'warning.400' }}
               >
                 @{item.home_team.city}
               </Text>
@@ -163,54 +195,56 @@ const GameList = ({
     return (
       <>
         {hasPagination ? (
-          <Stack my="1" px="2" direction="row" justifyContent="space-between">
-            <Stack
-              justifyContent="space-evenly"
-              alignItems="center"
-              borderRadius="sm"
-              bg="blueGray.300"
-              _dark={{ bg: "blueGray.800" }}
-              direction="row"
-              space={2}
-            >
-              {Platform.OS === "android" && (
-                <IconButton
-                  onPress={showDatepicker}
-                  alignSelf="center"
-                  _icon={{
-                    as: FontAwesome,
-                    name: 'search',
-                    size: 'sm',
-                    color: 'lightBlue.800',
-                  }}
-                />
-              )}
-              {showCalendar && Platform.OS === "android" && (
-                <DateTimePicker
-                  testID="dateTimePicker"
-                  value={dateToSearch}
-                  mode="date"
-                  display="default"
-                  onChange={onDateChange}
-                />
-              )}
-              {Platform.OS === "ios" && (
-                <DateTimePicker
-                  style={{ width: 74, backgroundColor: "white", }}
-                  value={dateToSearch}
-                  mode="date"
-                  display="default"
-                  onChange={onDateChange}
-                />
-              )}
-            </Stack>
+          <Stack
+            borderRadius="lg"
+            bg="blueGray.200"
+            _dark={{ bg: 'blueGray.900' }}
+            my="1"
+            px="2"
+            direction="row"
+            justifyContent="space-between"
+          >
+            {Platform.OS === 'android' && (
+              <IconButton
+                my="1"
+                px="2"
+                onPress={showDatepicker}
+                alignSelf="center"
+                _icon={{
+                  as: FontAwesome,
+                  name: 'search',
+                  size: 'xs',
+                  color: 'lightBlue.800',
+                }}
+              />
+            )}
+            {showCalendar && Platform.OS === 'android' && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={dateToSearch}
+                mode="date"
+                display="default"
+                onChange={onDateChange}
+              />
+            )}
+            {Platform.OS === 'ios' && (
+              <DateTimePicker
+                style={{ width: 74, backgroundColor: 'white' }}
+                value={dateToSearch}
+                mode="date"
+                display="default"
+                onChange={onDateChange}
+              />
+            )}
 
             <Stack
+              my="1"
+              px="2"
               justifyContent="space-evenly"
               alignItems="center"
               borderRadius="sm"
               bg="blueGray.300"
-              _dark={{ bg: "blueGray.800" }}
+              _dark={{ bg: 'blueGray.800' }}
               direction="row"
               space={2}
             >
@@ -262,9 +296,11 @@ const GameList = ({
               </Checkbox>
             </Stack>
             <Stack
+              my="1"
+              px="2"
               borderRadius="sm"
               bg="blueGray.300"
-              _dark={{ bg: "blueGray.800" }}
+              _dark={{ bg: 'blueGray.800' }}
               direction="row"
               alignSelf="flex-end"
             >
@@ -283,7 +319,7 @@ const GameList = ({
                   alignSelf="center"
                   bg="muted.300"
                   mt="8"
-                  fontSize="12px"
+                  fontSize="10px"
                   fontFamily="Oswald-Bold"
                   borderRadius="md"
                   _dark={{ bg: 'warning.800' }}
@@ -291,7 +327,7 @@ const GameList = ({
                   {progress}%
                 </Text>
                 <AnimatedCircularProgress
-                  size={50}
+                  size={38}
                   width={5}
                   backgroundWidth={5}
                   fill={progress}
@@ -307,51 +343,58 @@ const GameList = ({
           </Stack>
         ) : (
           <Stack
-            justifyContent="space-between"
-            alignItems="center"
-            borderRadius="sm"
-            direction="row"
+            borderRadius="lg"
+            bg="blueGray.200"
+            _dark={{ bg: 'blueGray.900' }}
+            my="1"
             px="2"
+            direction="row"
+            justifyContent="space-between"
           >
+            {Platform.OS === 'android' && (
+              <IconButton
+                my="1"
+                px="2"
+                onPress={showDatepicker}
+                alignSelf="center"
+                _icon={{
+                  as: FontAwesome,
+                  name: 'search',
+                  size: 'xs',
+                  color: 'lightBlue.800',
+                }}
+              />
+            )}
+            {showCalendar && Platform.OS === 'android' && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={dateToSearch}
+                mode="date"
+                display="default"
+                onChange={onDateChange}
+              />
+            )}
+            {Platform.OS === 'ios' && (
+              <DateTimePicker
+                style={{ width: 74, backgroundColor: 'white' }}
+                value={dateToSearch}
+                mode="date"
+                display="default"
+                onChange={onDateChange}
+              />
+            )}
             <Stack
-              alignItems="center"
-              borderRadius="sm"
+              _dark={{ bg: 'blueGray.800' }}
+              my="1"
+              p="2"
+              borderRadius="md"
               bg="blueGray.300"
-              mt="2"
             >
-              {Platform.OS === "android" && (
-                <IconButton
-                  onPress={showDatepicker}
-                  alignSelf="center"
-                  _icon={{
-                    as: FontAwesome,
-                    name: 'search',
-                    size: 'sm',
-                    color: 'lightBlue.800',
-                  }}
-                />
+              {timeZone.includes('Asia') ? (
+                <Text>Games on {dateToSearch.toLocaleDateString()} GMT+8</Text>
+              ) : (
+                <Text>Games on {dateToSearch.toLocaleDateString()} ET</Text>
               )}
-              {showCalendar && Platform.OS === "android" && (
-                <DateTimePicker
-                  testID="dateTimePicker"
-                  value={dateToSearch}
-                  mode="date"
-                  display="default"
-                  onChange={onDateChange}
-                />
-              )}
-              {Platform.OS === "ios" && (
-                <DateTimePicker
-                  style={{ width: 74, backgroundColor: "white", }}
-                  value={dateToSearch}
-                  mode="date"
-                  display="default"
-                  onChange={onDateChange}
-                />
-              )}
-            </Stack>
-            <Stack _dark={{ bg: "blueGray.800" }} mt="2" p="2" borderRadius="md" bg="blueGray.300">
-              <Text>Games on {dateToSearch.toLocaleDateString()}</Text>
             </Stack>
           </Stack>
         )}
@@ -370,7 +413,7 @@ const GameList = ({
   const renderFooter = () => {
     return (
       pagesTotal === page && (
-        <Center mt="2" p="2" borderRadius="md" bg="blueGray.300">
+        <Center mt="4" p="2" borderRadius="md" bg="blueGray.300">
           <Text color="warning.700" fontFamily="Oswald-Regular">
             No More Games to show
           </Text>
@@ -379,9 +422,41 @@ const GameList = ({
     );
   };
 
+  const renderEmpty = () => {
+    return (
+      <>
+        {!initialMount && (
+          <Stack flex={1} mt="20%" justifyContent="center" alignItems="center">
+            <Image
+              source={{
+                uri: 'https://cdn.statmuse.com/app/images/error/crying-jordan-5d4c26601d2272e1371e5a684b59d845.png?vsn=d',
+              }}
+              alt="Crying jordan"
+              size="xl"
+            />
+            <Text color="error.400">Sorry, no games available..</Text>
+            <Stack direction="row">
+              <Text>Pull down to </Text>
+              <Icon
+                as={EvilIcons}
+                color="warning.500"
+                name="refresh"
+                size={'sm'}
+                variant="solid"
+              />
+            </Stack>
+          </Stack>
+        )}
+      </>
+    );
+  };
+
   return (
     <>
       <BigList
+        //to center emptylist component
+        hideMarginalsOnEmpty={true}
+        renderEmpty={renderEmpty}
         footerHeight={50}
         renderFooter={renderFooter}
         ref={flatList}
@@ -407,7 +482,10 @@ const GameList = ({
         itemHeight={95}
         keyExtractor={(item) => item.id.toString()}
       />
-      {isFetchingMore && <Spinner size="lg" my="2" color="warning.500" pb="4" />}
+
+      {isFetchingMore && (
+        <Spinner size="sm" my="1" color="warning.500" pb="6" />
+      )}
     </>
   );
 };

@@ -11,9 +11,11 @@ export const dayToShow = (date) => {
 
   return day === today && month === currentMonth
     ? 'Today'
-    : day === today + 1 && month === currentMonth
-      ? 'Tomorrow'
-      : day === today - 1 && month === currentMonth
-        ? 'Yesterday'
-        : days[parseDate(date).getDay()];
+    : (day === today + 1 && month === currentMonth) ||
+      month === currentMonth + 1
+    ? 'Tomorrow'
+    : (day === today - 1 && month === currentMonth) ||
+      month === currentMonth - 1
+    ? 'Yesterday'
+    : days[parseDate(date).getDay()];
 };

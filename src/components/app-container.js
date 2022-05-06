@@ -1,7 +1,7 @@
 import React from 'react';
 import { NativeBaseProvider } from 'native-base';
 import theme from '../theme';
-import { Provider as MenuProvider } from '../context/menu-context';
+import { Provider as LocalizationProvider } from '../context/localization-context';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -26,11 +26,11 @@ const colorModeManager = {
 const AppContainer = ({ children }) => {
   return (
     <NavigationContainer>
-      <MenuProvider>
+      <LocalizationProvider>
         <NativeBaseProvider colorModeManager={colorModeManager} theme={theme}>
           {children}
         </NativeBaseProvider>
-      </MenuProvider>
+      </LocalizationProvider>
     </NavigationContainer>
   );
 };

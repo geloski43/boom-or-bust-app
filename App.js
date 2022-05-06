@@ -1,6 +1,6 @@
 import React from 'react';
 import AppContainer from './src/components/app-container';
-import Navigator from './src/index';
+import Navigator from './src/navigator';
 import useCachedResources from './src/hooks/use-cached-resources';
 import { LogBox } from 'react-native';
 

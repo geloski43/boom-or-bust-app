@@ -1,31 +1,28 @@
 import axios from 'axios';
 
-export const getPlayers = async (page, perPage) =>
+export const getPlayers = async (page) =>
   await axios.get(
-    `https://www.balldontlie.io/api/v1/players?page=${page}&per_page=${perPage}`
+    `https://www.balldontlie.io/api/v1/players?page=${
+      page ? page : 1
+    }&per_page=50`
   );
+
+export const getPlayer = async (id) =>
+  await axios.get(`https://www.balldontlie.io/api/v1/players/${id}`);
 
 export const searchPlayer = async (query) =>
+  await axios.get(`https://www.balldontlie.io/api/v1/players?search=${query}`);
+
+export const getAverages = async (season, playerId) =>
   await axios.get(
-    `https://www.balldontlie.io/api/v1/players?search=${query}&per_page=1`
+    `https://www.balldontlie.io/api/v1/season_averages?season=${season}&player_ids[]=${playerId}`
   );
 
-export const getAverages = async (season, playerIds) =>
+export const getStats = async (season, playerId, isPostSeason) =>
   await axios.get(
-    `https://www.balldontlie.io/api/v1/season_averages?${
-      season ? `season=${season}&` : ''
-    }player_ids[]=${playerIds}`
-  );
-
-export const getStats = async (
-  season,
-  playerIds,
-  page,
-  perPage,
-  isPostSeason
-) =>
-  await axios.get(
-    `https://www.balldontlie.io/api/v1/stats?seasons[]=${season}&player_ids[]=${playerIds}&page=${page}&per_page=${perPage}&postseason=${isPostSeason}`
+    `https://www.balldontlie.io/api/v1/stats?${
+      season ? `seasons[]=${season}&` : `seasons[]=${new Date().getFullYear()}&`
+    }&player_ids[]=${playerId}&postseason=${isPostSeason}`
   );
 
 export const getTeams = async () =>

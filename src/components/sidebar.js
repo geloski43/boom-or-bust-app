@@ -45,13 +45,16 @@ const Sidebar = (props) => {
   const handlePressBackButton = useCallback(() => {
     navigation.closeDrawer();
   }, [navigation]);
-  const handlePressMenuLayout = useCallback(() => {
+  const handlePressGames = useCallback(() => {
     navigation.navigate('Games');
   }, [navigation]);
-  const handlePressMenuForms = useCallback(() => {
+  const handlePressTeams = useCallback(() => {
     navigation.navigate('Teams');
   }, [navigation]);
 
+  const handlePressPlayers = useCallback(() => {
+    navigation.navigate('Players');
+  }, [navigation]);
   return (
     <Box
       safeArea
@@ -92,15 +95,21 @@ const Sidebar = (props) => {
 
         <MenuButton
           active={currentRoute === 'Games'}
-          onPress={handlePressMenuLayout}
+          onPress={handlePressGames}
         >
           Games
         </MenuButton>
         <MenuButton
           active={currentRoute === 'Teams'}
-          onPress={handlePressMenuForms}
+          onPress={handlePressTeams}
         >
           Teams
+        </MenuButton>
+        <MenuButton
+          active={currentRoute === 'Players'}
+          onPress={handlePressPlayers}
+        >
+          Players
         </MenuButton>
       </VStack>
       <Center>
@@ -139,7 +148,7 @@ const Sidebar = (props) => {
             />
           ))}
         </HStack>
-        <Text textAlign={"center"} fontSize="11px" fontWeight="extrabold">
+        <Text textAlign={'center'} fontSize="11px" fontWeight="extrabold">
           &copy; {new Date().getFullYear()} Boom or Bust™. All rights reserved.
         </Text>
       </Center>
