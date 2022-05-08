@@ -280,11 +280,9 @@ const PlayerProfile = ({ player, playerDetailedInfo }) => {
             name: 'expand-more',
           }}
         /> */}
-        <Center>
-          <Text>
-            <PlayerProfileTabs />
-          </Text>
-        </Center>
+
+        <PlayerProfileTabs />
+
 
         {/* {detailedInfoOpen && (
           <ScrollView

@@ -32,15 +32,13 @@ export default function PlayerProfiletabs() {
   ]);
 
   return (
-    <View style={{ height: '100%' }}>
-      <TabView
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        onIndexChange={setIndex}
-        initialLayout={initialLayout}
-        style={styles.container}
-      />
-    </View>
+    <TabView
+      navigationState={{ index, routes }}
+      renderScene={renderScene}
+      onIndexChange={setIndex}
+      initialLayout={initialLayout}
+      style={styles.container}
+    />
   );
 }
 
