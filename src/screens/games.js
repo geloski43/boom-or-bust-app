@@ -1,11 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import { getGames, searchGameByDate } from '../api/ball-dont-lie-api';
 import ScreenContainer from '../components/screen-container';
 import bballGame from '../assets/images/bball-game.jpg';
-import { Skeleton, HStack, VStack, Box } from 'native-base';
-import GameList from '../components/game-list';
+import GameList from '../components/games/game-list';
+import { GamesPlaceholder } from '../components/placeholders';
+import { teamLogo, parseDate } from '../utils/utils';
+import GamelistFilter from '../components/games/game-list-filter';
+import { Context as LocalizationContext } from '../context/localization-context';
 
 const Games = ({ navigation }) => {
+  const localeContext = useContext(LocalizationContext);
+  const timeZone = localeContext.state.timezoneName;
+
   const [games, setGames] = useState([]);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [dateToSearch, setDateToSearch] = useState(new Date());
@@ -17,9 +23,11 @@ const Games = ({ navigation }) => {
   const [hasPagination, setHasPagination] = useState(true);
   const [initialMount, setInitialMount] = useState(true);
 
-  const parseDate = (input) => {
-    return new Date(input);
-  };
+  let progress = Math.round((page / pagesTotal) * 100);
+
+  const gamelistRef = useRef();
+  const moveToTop = () =>
+    gamelistRef.current && gamelistRef.current.scrollToTop({ animmated: true });
 
   // fetching game by date
   const fetchGameByDate = (selectedDate) => {
@@ -30,20 +38,10 @@ const Games = ({ navigation }) => {
       .then((res) => {
         arr = res.data.data.map((obj) => ({
           ...obj,
-          home_team_logo:
-            obj.home_team.id === 13
-              ? `https://cdn.statmuse.com/img/nba/teams/nba_los_angeles_clippers_secondary.png`
-              : `https://cdn.statmuse.com/img/nba/teams/nba_${obj.home_team.full_name
-                  .replace(/ /g, '_')
-                  .toLowerCase()}_secondary.png`,
-          visitor_team_logo:
-            obj.visitor_team.id === 13
-              ? `https://cdn.statmuse.com/img/nba/teams/nba_los_angeles_clippers_secondary.png`
-              : `https://cdn.statmuse.com/img/nba/teams/nba_${obj.visitor_team.full_name
-                  .replace(/ /g, '_')
-                  .toLowerCase()}_secondary.png`,
-          phDate: new Date(
-            parseDate(obj.date).setDate(parseDate(obj.date).getDate() + 1)
+          home_team_logo: teamLogo(obj.home_team.id, obj.home_team.full_name),
+          visitor_team_logo: teamLogo(
+            obj.visitor_team.id,
+            obj.visitor_team.full_name
           ),
         }));
         totalPages = res.data.meta.total_pages;
@@ -58,23 +56,40 @@ const Games = ({ navigation }) => {
   };
 
   const onDateChange = (event, selectedDate) => {
-    // console.log('onDateChange', selectedDate);
+    console.log('onDateChange event', timeZone);
+    setShowCalendar(false);
+    const timestamp = event.nativeEvent.timestamp;
     const dateSelect = selectedDate || dateToSearch;
-    // if no date is selected just close the calendar
-    if (!selectedDate) {
-      console.log('no date selected');
+    const localeDate = () => {
+      return timeZone.includes('Asia') && dateSelect
+        ? new Date(
+            parseDate(
+              dateSelect && dateSelect.toISOString().slice(0, 10)
+            ).setDate(
+              parseDate(
+                dateSelect && dateSelect.toISOString().slice(0, 10)
+              ).getDate() - 1
+            )
+          )
+            .toISOString()
+            .slice(0, 10)
+        : dateSelect && dateSelect.toISOString().slice(0, 10);
+    };
+
+    if (!timestamp) {
       setShowCalendar(false);
+      console.log('no date selected');
     }
     // else call the fetchGameByDate function
     else {
+      console.log('date selected', typeof localeDate());
+      setShowCalendar(false);
       setPage(1);
       setIsPostSeason(null);
       setDateToSearch(dateSelect);
-      let date = dateSelect.toISOString().slice(0, 10);
       // set hasPagination to false so we can show alternate section header and prevent fetching more data
       setHasPagination(false);
-      fetchGameByDate(date);
-      setShowCalendar(false);
+      fetchGameByDate(localeDate());
     }
   };
 
@@ -83,55 +98,41 @@ const Games = ({ navigation }) => {
   };
 
   const fetchGames = (pageVar, postseason) => {
-    setInitialMount(false);
+    console.log('fetching games');
     setHasPagination(true);
     setIsLoading(true);
     let totalPages = null;
+    let arr = [];
     getGames(pageVar, postseason)
       .then((res) => {
+        console.log('fetching games', res.data.data);
         totalPages = res.data.meta.total_pages;
-        let arr = [];
-        getGames(pageVar, postseason)
-          .then((res) => {
-            arr = res.data.data.map((obj) => ({
-              ...obj,
-              home_team_logo:
-                obj.home_team.id === 13
-                  ? `https://cdn.statmuse.com/img/nba/teams/nba_los_angeles_clippers_secondary.png`
-                  : `https://cdn.statmuse.com/img/nba/teams/nba_${obj.home_team.full_name
-                      .replace(/ /g, '_')
-                      .toLowerCase()}_secondary.png`,
-              visitor_team_logo:
-                obj.visitor_team.id === 13
-                  ? `https://cdn.statmuse.com/img/nba/teams/nba_los_angeles_clippers_secondary.png`
-                  : `https://cdn.statmuse.com/img/nba/teams/nba_${obj.visitor_team.full_name
-                      .replace(/ /g, '_')
-                      .toLowerCase()}_secondary.png`,
-              phDate: new Date(
-                parseDate(obj.date).setDate(parseDate(obj.date).getDate() + 1)
-              ),
-            }));
-            setPagesTotal(totalPages);
-            setGames(arr);
-            // console.log('fetching games');
-            setIsLoading(false);
-          })
-          .catch((error) => {
-            console.error(error);
-            setIsLoading(false);
-          });
+        arr = res.data.data.map((obj) => ({
+          ...obj,
+          home_team_logo: teamLogo(obj.home_team.id, obj.home_team.full_name),
+          visitor_team_logo: teamLogo(
+            obj.visitor_team.id,
+            obj.visitor_team.full_name
+          ),
+        }));
+        setPagesTotal(totalPages);
+        setGames(arr);
+        setIsLoading(false);
+        setInitialMount(false);
       })
       .catch((error) => {
         console.error(error);
+        setIsLoading(false);
+        setInitialMount(false);
       });
   };
 
   const fetchMore = (pageVar, postseason) => {
+    console.log('fetching more games current page is', page);
     setHasPagination(true);
     if (page === pagesTotal) {
       return;
     }
-    console.log('fetching more', page);
     setIsFetchingMore(true);
     let arr = [];
     let currentPage = page + 1;
@@ -139,26 +140,15 @@ const Games = ({ navigation }) => {
       .then((res) => {
         arr = res.data.data.map((obj) => ({
           ...obj,
-          home_team_logo:
-            obj.home_team.id === 13
-              ? `https://cdn.statmuse.com/img/nba/teams/nba_los_angeles_clippers_secondary.png`
-              : `https://cdn.statmuse.com/img/nba/teams/nba_${obj.home_team.full_name
-                  .replace(/ /g, '_')
-                  .toLowerCase()}_secondary.png`,
-          visitor_team_logo:
-            obj.visitor_team.id === 13
-              ? `https://cdn.statmuse.com/img/nba/teams/nba_los_angeles_clippers_secondary.png`
-              : `https://cdn.statmuse.com/img/nba/teams/nba_${obj.visitor_team.full_name
-                  .replace(/ /g, '_')
-                  .toLowerCase()}_secondary.png`,
-          phDate: new Date(
-            parseDate(obj.date).setDate(parseDate(obj.date).getDate() + 1)
+          home_team_logo: teamLogo(obj.home_team.id, obj.home_team.full_name),
+          visitor_team_logo: teamLogo(
+            obj.visitor_team.id,
+            obj.visitor_team.full_name
           ),
         }));
         setPage(currentPage);
         setGames([...games, ...arr]);
         setIsFetchingMore(false);
-        // console.log('fetching games', res.data.meta);
       })
       .catch((error) => {
         setIsFetchingMore(false);
@@ -172,61 +162,47 @@ const Games = ({ navigation }) => {
 
   return (
     <ScreenContainer title={'Games'} navigation={navigation} image={bballGame}>
-      {!isLoading ? (
-        <GameList
-          initialMount={initialMount}
-          hasPagination={hasPagination}
-          setPage={setPage}
-          isPostSeason={isPostSeason}
-          setIsPostSeason={setIsPostSeason}
-          showCalendar={showCalendar}
-          dateToSearch={dateToSearch}
-          showDatepicker={showDatepicker}
-          onDateChange={onDateChange}
-          page={page}
-          pagesTotal={pagesTotal}
-          isLoading={isLoading}
-          isFetchingMore={isFetchingMore}
-          fetchMore={fetchMore}
-          fetchGames={fetchGames}
-          data={games}
-          setShowCalendar={setShowCalendar}
-        />
+      {!isLoading && !initialMount ? (
+        <>
+          <GamelistFilter
+            hasPagination={hasPagination}
+            onDateChange={onDateChange}
+            isPostSeason={isPostSeason}
+            setIsPostSeason={setIsPostSeason}
+            setPage={setPage}
+            fetchGames={fetchGames}
+            progress={progress}
+            showCalendar={showCalendar}
+            moveToTop={moveToTop}
+            initialMount={initialMount}
+            games={games}
+            showDatepicker={showDatepicker}
+            dateToSearch={dateToSearch}
+          />
+          <GameList
+            gamelistRef={gamelistRef}
+            initialMount={initialMount}
+            hasPagination={hasPagination}
+            setPage={setPage}
+            isPostSeason={isPostSeason}
+            setIsPostSeason={setIsPostSeason}
+            showCalendar={showCalendar}
+            dateToSearch={dateToSearch}
+            showDatepicker={showDatepicker}
+            onDateChange={onDateChange}
+            page={page}
+            pagesTotal={pagesTotal}
+            isLoading={isLoading}
+            isFetchingMore={isFetchingMore}
+            fetchMore={fetchMore}
+            fetchGames={fetchGames}
+            data={games}
+            setShowCalendar={setShowCalendar}
+            navigation={navigation}
+          />
+        </>
       ) : (
-        Array.from(Array(7).keys()).map((v, i) => (
-          <Box key={i} my="1" rounded="sm" borderWidth="1" p="2">
-            <Skeleton h="20px" endColor="warmGray.50" />
-            <HStack justifyContent="space-between">
-              <VStack space={2} px="2">
-                <HStack space={3}>
-                  <Skeleton
-                    borderWidth={1}
-                    borderColor="coolGray.200"
-                    endColor="warmGray.50"
-                    size={25}
-                    rounded="md"
-                  />
-                  <Skeleton.Text alignSelf="flex-end" lines={1} w="10" />
-                  <Skeleton.Text alignSelf="flex-end" lines={1} w="5" />
-                </HStack>
-                <HStack space={3}>
-                  <Skeleton
-                    borderWidth={1}
-                    borderColor="coolGray.200"
-                    endColor="warmGray.50"
-                    size={25}
-                    rounded="md"
-                  />
-                  <Skeleton.Text alignSelf="flex-end" lines={1} w="10" />
-                  <Skeleton.Text alignSelf="flex-end" lines={1} w="5" />
-                </HStack>
-              </VStack>
-              <VStack justifyContent="flex-end">
-                <Skeleton.Text lines={2} w="20" />
-              </VStack>
-            </HStack>
-          </Box>
-        ))
+        <GamesPlaceholder />
       )}
     </ScreenContainer>
   );

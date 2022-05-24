@@ -1,5 +1,6 @@
 import React from 'react';
-import { VStack, Select, CheckIcon } from 'native-base';
+import { VStack, Select, CheckIcon, Icon } from 'native-base';
+import { Entypo } from '@expo/vector-icons';
 
 const SelectTeams = ({
   items,
@@ -11,6 +12,7 @@ const SelectTeams = ({
   return (
     <VStack>
       <Select
+        dropdownIcon={<Icon name="chevron-small-down" as={Entypo} size="sm" />}
         shadow={2}
         selectedValue={selectedValue[objKey]}
         minWidth="95"

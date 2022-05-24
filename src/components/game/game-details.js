@@ -1,18 +1,55 @@
 import React, { useContext } from 'react';
 import { Text, Box, Image, Badge, Stack, Center, Icon } from 'native-base';
-import { dayToShow, parseDate } from '../utils/day-to-show';
+import { dayToShow } from '../../utils/utils';
 import { Entypo } from '@expo/vector-icons';
-import { Context as LocalizationContext } from '../context/localization-context';
-import BackButton from '../components/back-button';
+import { Context as LocalizationContext } from '../../context/localization-context';
+import BackButton from '../back-button';
+import { parseDate } from '../../utils/utils';
 
-const GameDetails = ({ navigation, game }) => {
+const GameDetails = ({ initialMount, game }) => {
   const localeContext = useContext(LocalizationContext);
   const timeZone = localeContext.state.timezoneName;
 
+  const opacity = (firstScore, secondScore) => {
+    if (firstScore === secondScore) {
+      return 0.5;
+    } else if (firstScore > secondScore) {
+      return 1;
+    }
+    return 0.5;
+  };
+
+  const localeDate = () => {
+    return timeZone.includes('Asia') && game.date
+      ? new Date(
+          parseDate(game.date.slice(0, 10)).setDate(
+            parseDate(game.date.slice(0, 10)).getDate() + 1
+          )
+        )
+          .toISOString()
+          .slice(0, 10)
+      : game.date && game.date.slice(0, 10);
+  };
+
   return (
     <>
-      <BackButton route={'Games'} text={'Back to Games'} />
-      <Box rounded="sm" borderWidth="1" p="2">
+      {!initialMount && <BackButton route={'Games'} text={'Back to Games'} />}
+      <Box
+        rounded="sm"
+        p="2"
+        overflow="hidden"
+        borderColor="coolGray.200"
+        borderWidth="1"
+        backgroundColor="gray.200"
+        _dark={{
+          borderColor: 'coolGray.600',
+          backgroundColor: 'gray.500',
+        }}
+        _web={{
+          shadow: 2,
+          borderWidth: 0,
+        }}
+      >
         <Center>
           {game.postseason && (
             <Badge colorScheme="warning" _dark={{ colorScheme: 'warmGray' }}>
@@ -30,16 +67,17 @@ const GameDetails = ({ navigation, game }) => {
               source={{ uri: game.visitor_team_logo }}
               alt="Alternate Text"
             />
+
             <Text
-              opacity={game.home_team_score > game.visitor_team_score ? 1 : 0.5}
+              opacity={opacity(game.visitor_team_score, game.home_team_score)}
             >
               {game.visitor_team && game.visitor_team.full_name}
             </Text>
             <Text
               fontFamily="Oswald-Bold"
-              opacity={game.visitor_team_score < game.home_team_score ? 1 : 0.5}
+              opacity={opacity(game.visitor_team_score, game.home_team_score)}
             >
-              {game.home_team_score}
+              {game.visitor_team_score}
             </Text>
           </Stack>
           <Stack alignItems="center" space={1} mx="2" direction="column">
@@ -52,21 +90,22 @@ const GameDetails = ({ navigation, game }) => {
               alt="Alternate Text"
             />
             <Text
-              opacity={game.home_team_score < game.visitor_team_score ? 1 : 0.5}
+              opacity={opacity(game.home_team_score, game.visitor_team_score)}
             >
               {game.home_team && game.home_team.full_name}
             </Text>
             <Text
               fontFamily="Oswald-Bold"
-              opacity={game.visitor_team_score > game.home_team_score ? 1 : 0.5}
+              opacity={opacity(game.home_team_score, game.visitor_team_score)}
             >
-              {game.visitor_team_score}
+              {game.home_team_score}
             </Text>
           </Stack>
         </Stack>
         <Center mx="2">
           {game.status &&
           game.status !== 'Final' &&
+          !game.time &&
           timeZone.includes('Asia') ? (
             <Text>{`${game.status.slice(0, 5)}${
               game.status.includes('PM') ? 'AM GMT+8' : 'PM GMT+8'
@@ -76,36 +115,16 @@ const GameDetails = ({ navigation, game }) => {
           )}
           <Text>{game.time}</Text>
         </Center>
-        {timeZone.includes('Asia') ? (
-          <Stack space={2} justifyContent="center" mt="2" direction="row">
-            <Text
-              _dark={{ color: 'warning.300' }}
-              color="warning.800"
-              fontFamily="Oswald-Regular"
-            >
-              {dayToShow(game.phDate && game.phDate)}
-            </Text>
-
-            <Text alignSelf="flex-end">
-              {game.phDate && game.phDate.toLocaleDateString()}
-            </Text>
-          </Stack>
-        ) : (
-          <Stack space={2} justifyContent="center" mt="2" direction="row">
-            <Text
-              _dark={{ color: 'warning.300' }}
-              color="warning.800"
-              fontFamily="Oswald-Regular"
-            >
-              {dayToShow(game.date && game.date.slice(0, 10))}
-            </Text>
-
-            <Text alignSelf="flex-end">
-              {game.date &&
-                parseDate(game.date.slice(0, 10)).toLocaleDateString()}
-            </Text>
-          </Stack>
-        )}
+        <Stack space={2} justifyContent="center" mt="2" direction="row">
+          <Text
+            _dark={{ color: 'warning.300' }}
+            color="warning.800"
+            fontFamily="Oswald-Regular"
+          >
+            {dayToShow(localeDate(), timeZone)}
+          </Text>
+          <Text alignSelf="flex-end">{localeDate()}</Text>
+        </Stack>
         <Text
           alignSelf="center"
           color="warning.800"
@@ -115,7 +134,7 @@ const GameDetails = ({ navigation, game }) => {
           @{game.home_team && game.home_team.city}
         </Text>
       </Box>
-      {game.status !== 'Final' && (
+      {!game.time && game.status !== 'Final' && (
         <Text color="muted.400" fontSize="10px" ml="2">
           {`${
             timeZone.includes('Asia')

@@ -12,21 +12,29 @@ import SelectTeams from './select-teams';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 
-const TeamList = ({ data, toFilter, setToFilter }) => {
+const TeamList = ({ data, toFilter, setToFilter, initialMount }) => {
   const navigation = useNavigation();
 
   const renderItem = ({ item }) => {
     return (
       <Box
-        borderBottomWidth="1"
-        _dark={{
-          borderColor: 'gray.600',
-        }}
-        borderColor="coolGray.200"
+        shadow={2}
         pl="4"
         pr="5"
         py="2"
         mb="2"
+        overflow="hidden"
+        borderColor="coolGray.200"
+        borderWidth="1"
+        backgroundColor="gray.200"
+        _dark={{
+          borderColor: 'coolGray.600',
+          backgroundColor: 'gray.500',
+        }}
+        _web={{
+          shadow: 2,
+          borderWidth: 0,
+        }}
       >
         <HStack space={3} justifyContent="space-between">
           <Image
@@ -92,38 +100,46 @@ const TeamList = ({ data, toFilter, setToFilter }) => {
     );
   };
 
+  const renderHeader = () => {
+    return (
+      <>
+        {!initialMount && (
+          <HStack mb="2" justifyContent="flex-end">
+            <SelectTeams
+              items={['All', 'East', 'West']}
+              setSelected={setToFilter}
+              placeHolder="Conference"
+              selectedValue={toFilter}
+              objKey={'conference'}
+            />
+            <SelectTeams
+              items={[
+                'All',
+                'Atlantic',
+                'Central',
+                'Southeast',
+                'Northwest',
+                'Pacific',
+                'Southwest',
+              ]}
+              setSelected={setToFilter}
+              placeHolder="Division"
+              selectedValue={toFilter}
+              objKey={'division'}
+            />
+          </HStack>
+        )}
+      </>
+    );
+  };
+
   return (
-    <>
-      <HStack mb="2" justifyContent="flex-end">
-        <SelectTeams
-          items={['All', 'East', 'West']}
-          setSelected={setToFilter}
-          placeHolder="Conference"
-          selectedValue={toFilter}
-          objKey={'conference'}
-        />
-        <SelectTeams
-          items={[
-            'All',
-            'Atlantic',
-            'Central',
-            'Southeast',
-            'Northwest',
-            'Pacific',
-            'Southwest',
-          ]}
-          setSelected={setToFilter}
-          placeHolder="Division"
-          selectedValue={toFilter}
-          objKey={'division'}
-        />
-      </HStack>
-      <FlatList
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-      />
-    </>
+    <FlatList
+      ListHeaderComponent={renderHeader}
+      data={data}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id.toString()}
+    />
   );
 };
 

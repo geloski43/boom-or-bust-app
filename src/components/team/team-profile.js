@@ -10,16 +10,16 @@ import {
   Container,
   Link,
 } from 'native-base';
-import BackButton from '../components/back-button';
+import BackButton from '../back-button';
 
-const TeamProfile = ({ teamBasicInfo, teamDetailedInfo, navigation }) => {
+const TeamProfile = ({ teamBasicInfo, teamDetailedInfo, initialMount }) => {
   return (
     <>
-      <BackButton route={'Teams'} text={'Back to Teams'} />
+      {!initialMount && <BackButton route={'Teams'} text={'Back to Teams'} />}
       <Box flex={1} alignItems="center">
         <Box
-          minW="90%"
-          rounded="lg"
+          minW="100%"
+          rounded="sm"
           overflow="hidden"
           borderColor="coolGray.200"
           borderWidth="1"
