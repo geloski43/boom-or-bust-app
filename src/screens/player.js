@@ -1,137 +1,626 @@
 import React, { useEffect, useState } from 'react';
-import { getPlayer } from '../api/ball-dont-lie-api';
+import { getPlayer, getStats } from '../api/ball-dont-lie-api';
 import { getInfo } from '../api/web-search-api';
-import ScreenContainer from '../components/screen-container';
-import bballGame from '../assets/images/bball-game.jpg';
-import { Skeleton, VStack, Stack, Center } from 'native-base';
-import { playerImageData } from '../constants/player-image-data';
-import PlayerProfile from '../components/player-profile';
+import { Text, View, Animated, StyleSheet, Platform } from 'react-native';
+import StickyParallaxHeader from 'react-native-sticky-parallax-header';
+import { useColorMode, Box } from 'native-base';
+import SeasonOptionModal from '../components/player/season-option-modal';
+import PlayerProfileTab from '../components/player/player-profile-tab';
+import PlayerAveragesTab from '../components/player/player-averages-tab';
+import HeaderForeground from '../components/player/header-foreground';
+import Header from '../components/player/header';
+import { PlayerHeaderPlaceholder } from '../components/placeholders';
+import {
+  genericPlayerImage,
+  findPlayerImage,
+  width,
+  height,
+  responsiveHeight,
+  responsiveWidth,
+  ifIphoneX,
+  teamLogo,
+  groupBy,
+} from '../utils/utils';
 
+const { event, ValueXY } = Animated;
 const Player = ({ route, navigation }) => {
-  const [playerBasicInfo, setPlayerBasicInfo] = useState({});
-  const [playerDetailedInfo, setPlayerDetailedInfo] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { itemId, fullName, biometrics } = route.params;
+  const { colorMode, toggleColorMode } = useColorMode();
+  // parallax states
+  const [headerLayout, setHeaderLayout] = useState({ height: 0 });
+  const [contentHeight, setContentHeight] = useState({});
+  const [scrollY, setScrollY] = useState(new ValueXY());
+  // parallax states
 
-  const genericImage = (string) => {
-    if (string === 'LA Clippers') {
-      return 'https://cdn.statmuse.com/img/nba/teams/Los-Angeles-Clippers-Silhouette.png';
-    } else if (string === 'Portland Trail Blazers') {
-      return 'https://cdn.statmuse.com/img/nba/teams/Portland-Trailblazers-Silhouette.png';
-    } else if (string === 'Chicago Bulls') {
-      return 'https://cdn.statmuse.com/img/nba/teams/chicago-bulls-silhouette.png';
-    } else {
-      string = string.replace(/\s+/g, '-');
-      return `https://cdn.statmuse.com/img/nba/teams/${string}-Silhouette.png`;
-    }
-  };
-
-  const findPlayerImage = (id) => {
-    const player = playerImageData.find((p) => p.id === id);
-    return player ? player.image : null;
-  };
-
-  const { itemId, firsName, lastName } = route.params;
+  const [initialMount, setInitialMount] = useState(true);
+  const [player, setPlayer] = useState({});
+  const [playerProfile, setPlayerProfile] = useState([]);
+  // we created 3 loading states to prevent re render of sub components
+  const [subLoading, setSubLoading] = useState(false);
+  const [quickLoading, setQuickLoading] = useState(false);
+  const [slowLoading, setSlowLoading] = useState(false);
+  // grouped stats will be used when a player has played on multiple teams in a season
+  const [groupedStats, setGroupedStats] = useState([]);
+  const [stats, setStats] = useState([]);
+  const [averages, setAverages] = useState([]);
+  const [season, setSeason] = useState(new Date().getFullYear());
+  const [isPostSeason, setIsPostSeason] = useState(false);
+  const [gamesPlayed, setGamesPlayed] = useState(0);
+  const [playerHeaderText, setPlayerHeaderText] = useState(biometrics);
+  const [teamData, setTeamData] = useState([]);
 
   const fetchPlayer = () => {
-    if (!itemId) return;
     console.log('fetching player');
-    setIsLoading(true);
-    let basic = {};
+    if (!itemId) return;
+    setQuickLoading(true);
+    let obj = {};
     getPlayer(itemId)
-      .then((player) => {
-        basic = {
-          ...player.data,
+      .then((res) => {
+        obj = {
+          ...res.data,
           playerImage:
-            findPlayerImage(player.data.id) ||
-            genericImage(player.data.team.full_name),
+            findPlayerImage(res.data.id) ||
+            genericPlayerImage(res.data.team.full_name),
         };
-        // console.log('fetching player', lastName);
-        setPlayerBasicInfo(basic);
-        setIsLoading(false);
+        setPlayer(obj);
+        setQuickLoading(false);
       })
       .catch((error) => {
         console.error(error);
-        setIsLoading(false);
+        setQuickLoading(false);
       });
   };
 
-  const fetchInfo = () => {
-    if (!firsName && !lastName) return;
+  const fetchStats = (year, id, postSeason) => {
+    let resData = [];
+    let gameStats = [];
+    let totalGamesCount = 0;
+    let acccumulatedTotals = {};
+    let mins = [];
+    let voidGames = [];
+    let currentTeam = [];
+    let teams = [];
+    //  we update subLoading after first mount
+    // to prevent re render of sub components
+    if (initialMount) {
+      setSlowLoading(true);
+    } else {
+      setSubLoading(true);
+    }
+    getStats(year, id, postSeason)
+      .then((res) => {
+        resData = res.data.data;
+        // get invalid games to be substracted from total games
+        voidGames = res.data.data.filter(
+          (game) => game.min === null || game.min === '0:00' || game.min === ''
+        );
+        totalGamesCount = res.data.meta.total_count - voidGames.length;
+        // if no data reset some states and return early
+        if (resData.length === 0 || totalGamesCount === 0) {
+          if (initialMount) {
+            setSlowLoading(false);
+          } else {
+            setSubLoading(false);
+          }
+          setInitialMount(false);
+          setGamesPlayed(0);
+          setAverages([]);
+          setGroupedStats([]);
+          setStats([]);
+          console.log('zero data');
+          return;
+        }
+        // else do all below
+        setGamesPlayed(totalGamesCount);
+        // we convert min values from Min:Sec format to minutes only
+        mins = resData.map((obj) => ({
+          convertedMins:
+            obj.min && obj.min.includes(':')
+              ? parseInt(obj.min.slice(0, 2)) +
+                  parseInt(obj.min.slice(-2)) / 60 || 0
+              : parseInt(obj.min) || 0,
+        }));
+        // we add teamlogo and teamid props,
+        // teamid which we will use to group games by same team if a player has multiple teams in a season
+        gameStats = resData.map((obj) => ({
+          ...obj,
+          teamLogo: teamLogo(obj.team.id, obj.team.full_name),
+          teamId: obj.team.id,
+        }));
+        // we will usee this to add team details in the accumulated totals object
+        currentTeam = resData.map((obj) => ({
+          teamId: obj.team.id,
+          teamAbbr: obj.team.abbreviation,
+          teamFullName: obj.team.full_name,
+          teamLogo: teamLogo(obj.team.id, obj.team.full_name),
+        }));
+        teams =
+          currentTeam &&
+          currentTeam.reduce((acc, current) => {
+            const x = acc.find((item) => item.teamId === current.teamId);
+            if (!x) {
+              return acc.concat([current]);
+            } else {
+              return acc;
+            }
+          }, []);
+
+        // accumulated totals
+        acccumulatedTotals = {
+          pts: resData.reduce(function (prev, cur) {
+            return prev + cur.pts;
+          }, 0),
+          reb: resData.reduce(function (prev, cur) {
+            return prev + cur.reb;
+          }, 0),
+          ast: resData.reduce(function (prev, cur) {
+            return prev + cur.ast;
+          }, 0),
+          blk: resData.reduce(function (prev, cur) {
+            return prev + cur.blk;
+          }, 0),
+          turnover: resData.reduce(function (prev, cur) {
+            return prev + cur.turnover;
+          }, 0),
+          stl: resData.reduce(function (prev, cur) {
+            return prev + cur.stl;
+          }, 0),
+
+          fga: resData.reduce(function (prev, cur) {
+            return prev + cur.fga;
+          }, 0),
+          fgm: resData.reduce(function (prev, cur) {
+            return prev + cur.fgm;
+          }, 0),
+
+          fg3a: resData.reduce(function (prev, cur) {
+            return prev + cur.fg3a;
+          }, 0),
+          fg3m: resData.reduce(function (prev, cur) {
+            return prev + cur.fg3m;
+          }, 0),
+
+          fta: resData.reduce(function (prev, cur) {
+            return prev + cur.fta;
+          }, 0),
+          ftm: resData.reduce(function (prev, cur) {
+            return prev + cur.ftm;
+          }, 0),
+
+          pf: resData.reduce(function (prev, cur) {
+            return prev + cur.pf;
+          }, 0),
+          oreb: resData.reduce(function (prev, cur) {
+            return prev + cur.oreb;
+          }, 0),
+          dreb: resData.reduce(function (prev, cur) {
+            return prev + cur.dreb;
+          }, 0),
+          min:
+            mins &&
+            mins.reduce(function (prev, cur) {
+              return prev + cur.convertedMins;
+            }, 0),
+          team: teams.map((team, i) => {
+            return {
+              ...team,
+              totalGamesPlayed: gameStats.filter(
+                (game) =>
+                  game.team.id === team.teamId ||
+                  game.min !== null ||
+                  game.min !== '0:00' ||
+                  game.min !== ''
+              ).length,
+            };
+          }),
+        };
+
+        // we need teamData so we can conditionally style when we select a team in the list
+        // if a player has played on multiple teams
+        setTeamData(
+          teams.map((team, i) => {
+            return {
+              ...team,
+              totalGamesPlayed: gameStats.filter(
+                (game) =>
+                  game.team.id === team.teamId &&
+                  game.min !== null &&
+                  game.min !== '0:00' &&
+                  game.min !== ''
+              ).length,
+            };
+          })
+        );
+        // we use this on header foreground
+        setAverages([
+          {
+            ...acccumulatedTotals,
+            isPostSeason,
+            season,
+            gamesPlayed: totalGamesCount,
+          },
+        ]);
+        // we use this to group stats by team so we can easily select data for a single team
+        setGroupedStats(groupBy(gameStats, 'teamId'));
+        // we use this to display total stats if there are multiple teams
+        setStats(gameStats);
+        if (initialMount) {
+          setSlowLoading(false);
+        } else {
+          setSubLoading(false);
+        }
+        setInitialMount(false);
+      })
+      .catch((err) => {
+        if (initialMount) {
+          setSlowLoading(false);
+        } else {
+          setSubLoading(false);
+        }
+        console.log(err);
+        setInitialMount(false);
+      });
+  };
+
+  const fetchProfile = () => {
     console.log('fetching player info');
-    setIsLoading(true);
-    getInfo(`${firsName} ${lastName}`)
+    let year = 0;
+    let header = '';
+    if (!fullName) return;
+    setQuickLoading(true);
+    getInfo(fullName)
       .then((response) => response.json())
       .then((data) => {
-        console.log('player info', data.Infobox.content);
-        setPlayerDetailedInfo(data.Infobox.content);
-        setIsLoading(false);
+        const content = data.Infobox.content;
+        const yearDrafted =
+          content && content.find((values) => values.label === 'NBA draft');
+        const listedHeight =
+          content && content.find((values) => values.label === 'Listed height');
+        const listedWeight =
+          content && content.find((values) => values.label === 'Listed weight');
+        console.log('content info is', content && content);
+        setQuickLoading(false);
+        if (yearDrafted && listedHeight && listedWeight) {
+          console.log('there is profile info listedHeight is', listedHeight);
+          // test if value has a number in it
+          header =
+            /\d/.test(listedHeight.value.slice(0, 1)) &&
+            /\d/.test(listedHeight.value.slice(5, -3)) &&
+            /\d/.test(listedWeight.value)
+              ? `${listedHeight.value.slice(0, 1)}'${listedHeight.value.slice(
+                  5,
+                  -3
+                )}",${listedWeight.value}s`
+              : biometrics;
+          year = /\d/.test(parseInt(yearDrafted.value.slice(0, 4)))
+            ? parseInt(yearDrafted.value.slice(0, 4))
+            : season - 1;
+          setPlayerHeaderText(header);
+          setSeason(year);
+          setPlayerProfile(data.Infobox.content);
+          fetchStats(year, itemId, isPostSeason);
+        } else {
+          console.log('there is no profile info listedweight is', listedWeight);
+          setPlayerHeaderText(biometrics);
+          setSeason(season - 1);
+          fetchStats(season - 1, itemId, isPostSeason);
+        }
       })
       .catch((error) => {
-        console.error('player info fetch error', error);
-        setIsLoading(false);
+        console.log('player info fetch error', error);
+        setQuickLoading(false);
       });
   };
 
+  // header parallax functions and variables
+
+  const textColor = colorMode === 'dark' ? 'white' : 'black';
+  const lgTextSize = responsiveWidth(4);
+  const headerHeight = ifIphoneX(92, responsiveHeight(13));
+  const contentBackground = colorMode === 'dark' ? '#525252' : '#d6d3d1';
+
+  const setHeaderSize = (headerLayout) =>
+    setHeaderLayout({ height: headerLayout.height });
+
+  // for parallax scroll position
+  const position = (scrollHeight, x) => x * 0.01 * scrollHeight;
+  const scrollPosition = (value) => {
+    return position(headerLayout.height, value);
+  };
+
+  // background of parallax header
+  const renderBackground = () => {
+    const headerBorderRadius = scrollY.y.interpolate({
+      inputRange: [0, height],
+      outputRange: [80, 0],
+      extrapolate: 'extend',
+    });
+
+    return (
+      <Animated.View
+        style={[
+          Platform.OS === 'android' ? styles.background : styles.backgroundIos,
+          {
+            borderBottomRightRadius: headerBorderRadius,
+            backgroundColor: colorMode === 'dark' ? '#002851' : '#e0f2fe',
+          },
+        ]}
+      />
+    );
+  };
+  // for ios marginBottom
+  const calcMargin = (title) => {
+    let marginBottom = 50;
+
+    if (contentHeight[title]) {
+      const padding = 24;
+      const isBigContent = height - contentHeight[title] < 0;
+
+      if (isBigContent) {
+        return marginBottom;
+      }
+
+      marginBottom = height - padding * 2 - headerHeight - contentHeight[title];
+
+      return marginBottom > 0 ? marginBottom : 0;
+    }
+    return marginBottom;
+  };
+
+  // wrapper for rendered component tab
+  const RenderContent = ({ title, children }) => {
+    const marginBottom = Platform.select({
+      ios: calcMargin(title),
+      android: 0,
+    });
+
+    return (
+      <Box
+        style={[
+          Platform.OS === 'android'
+            ? styles.contentContainer
+            : styles.contentContainerIos,
+          {
+            marginBottom,
+            backgroundColor: contentBackground,
+          },
+        ]}
+      >
+        {gamesPlayed !== 0 && (
+          <Text style={[styles.contentTitle, { color: textColor }]}>
+            {title}
+          </Text>
+        )}
+
+        {children}
+        <SeasonOptionModal
+          setSeason={setSeason}
+          fetchStats={fetchStats}
+          setIsPostSeason={setIsPostSeason}
+          player={player}
+          season={season}
+          isPostSeason={isPostSeason}
+        />
+      </Box>
+    );
+  };
+
+  // parallax top header
+  const renderHeader = () => (
+    <Header
+      player={player}
+      fullName={fullName}
+      scrollY={scrollY}
+      colorMode={colorMode}
+      scrollPosition={scrollPosition}
+    />
+  );
+
+  // parallax header foreground
+  const renderForeground = () => (
+    <>
+      {!slowLoading && !initialMount ? (
+        <HeaderForeground
+          scrollPosition={scrollPosition}
+          averages={averages}
+          scrollY={scrollY}
+          colorMode={colorMode}
+          fullName={fullName}
+          player={player}
+          playerHeaderText={playerHeaderText}
+          gamesPlayed={gamesPlayed}
+          season={season}
+          isPostSeason={isPostSeason}
+          isLoading={subLoading}
+        />
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            paddingHorizontal: 24,
+            justifyContent: 'flex-end',
+            paddingBottom: 24,
+          }}
+        >
+          <PlayerHeaderPlaceholder />
+        </View>
+      )}
+    </>
+  );
+
+  //  this will run every mount with route.params as deps
   useEffect(() => {
+    scrollY.y.addListener(({ value }) => (value = value));
     fetchPlayer();
-    fetchInfo();
-  }, [itemId, firsName, lastName]);
+    fetchProfile();
+  }, [itemId, fullName, biometrics]);
 
   // we add a listener (blur) as the user leaves the screen
   // we will clear the state so when the user navigates back
   // it wont show the previous data
   useEffect(() => {
     const clearState = navigation.addListener('blur', () => {
-      setPlayerBasicInfo({});
-      setPlayerDetailedInfo([]);
-      navigation.setParams({ itemId: null, firsName: null, lastName: null });
+      setPlayer({});
+      setPlayerProfile([]);
+      setStats([]);
+      setGroupedStats([]);
+      setAverages([]);
+      setIsPostSeason(false);
+      setSeason(new Date().getFullYear());
+      setGamesPlayed(0);
+      setInitialMount(true);
+      setPlayerHeaderText('');
+      scrollY.y.removeListener();
+      navigation.setParams({ itemId: null, fullName: null, biometrics: null });
     });
     return clearState;
   }, [navigation]);
 
   return (
-    <ScreenContainer title={'Player'} navigation={navigation} image={bballGame}>
-      {!isLoading ? (
-        <PlayerProfile
-          player={playerBasicInfo}
-          playerDetailedInfo={playerDetailedInfo}
-        />
-      ) : (
-        <VStack
-          mt="10"
-          m="1"
-          rounded="sm"
-          borderWidth="1"
-          p="2"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Center>
-            <VStack space={2} alignItems="center">
-              <Skeleton
-                borderWidth={1}
-                borderColor="coolGray.200"
-                endColor="warmGray.50"
-                size="190px"
-                rounded="lg"
-              />
-              <Stack
-                mt="2"
-                mb="4"
-                alignItems="center"
-                space={2}
-                direction="column"
+    <>
+      <StickyParallaxHeader
+        foreground={renderForeground()}
+        header={renderHeader()}
+        tabs={[
+          {
+            title: 'Profile',
+            content: (
+              <RenderContent
+                title={
+                  playerProfile && playerProfile.length > 0 && !quickLoading
+                    ? 'Player profile'
+                    : ''
+                }
               >
-                <Skeleton.Text lines={1} w="80px" />
-                <Skeleton.Text lines={1} w="100px" />
-                <Skeleton.Text lines={1} w="20px" />
-              </Stack>
-            </VStack>
-          </Center>
-        </VStack>
-      )}
-    </ScreenContainer>
+                <PlayerProfileTab
+                  averages={averages}
+                  playerProfile={playerProfile}
+                  isLoading={quickLoading}
+                  initialMount={initialMount}
+                />
+              </RenderContent>
+            ),
+          },
+          {
+            title: 'Averages',
+            content: (
+              <RenderContent
+                title={
+                  averages.length > 0 && !slowLoading ? 'Player averages' : ''
+                }
+              >
+                <PlayerAveragesTab
+                  colorMode={colorMode}
+                  allStats={stats}
+                  groupedStats={groupedStats}
+                  season={season}
+                  initialMount={initialMount}
+                  isPostSeason={isPostSeason}
+                  isLoading={slowLoading}
+                  subLoading={subLoading}
+                  teamData={teamData}
+                  totalGamesPlayed={gamesPlayed}
+                />
+              </RenderContent>
+            ),
+          },
+          {
+            title: 'Game Stats',
+            content: <Text>averages{initialMount.toString()}</Text>,
+          },
+        ]}
+        background={renderBackground()}
+        deviceWidth={width}
+        parallaxHeight={responsiveHeight(50)}
+        scrollEvent={event(
+          [{ nativeEvent: { contentOffset: { y: scrollY.y } } }],
+          { useNativeDriver: false }
+        )}
+        headerSize={setHeaderSize}
+        headerHeight={responsiveHeight(13)}
+        tabTextStyle={[styles.tabText, { fontSize: lgTextSize }]}
+        tabTextContainerStyle={{
+          backgroundColor: 'transparent',
+          borderRadius: 18,
+        }}
+        tabTextContainerActiveStyle={{
+          backgroundColor: colorMode === 'dark' ? '#374151' : '#e5e7eb',
+        }}
+        tabsWrapperStyle={{ paddingVertical: 12 }}
+      >
+        <RenderContent
+          title={
+            playerProfile && playerProfile.length > 0 && !quickLoading
+              ? 'Player profile'
+              : ''
+          }
+        >
+          <PlayerProfileTab
+            averages={averages}
+            playerProfile={playerProfile}
+            isLoading={quickLoading}
+            initialMount={initialMount}
+          />
+        </RenderContent>
+      </StickyParallaxHeader>
+    </>
   );
 };
+
+const styles = StyleSheet.create({
+  tabText: {
+    lineHeight: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    color: '#f97316',
+    fontFamily: 'Oswald-Regular',
+  },
+  background: {
+    width: '100%',
+    justifyContent: 'flex-end',
+    backgroundColor: '#eff6ff',
+    height: '100%',
+    shadowColor: '#171717',
+    elevation: 20,
+  },
+  backgroundIos: {
+    width: '100%',
+    justifyContent: 'flex-end',
+    backgroundColor: '#eff6ff',
+    height: '100%',
+    shadowColor: '#171717',
+    shadowOffset: { width: -2, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+  },
+  contentTitle: {
+    fontSize: 20,
+    lineHeight: 20,
+    alignSelf: 'flex-start',
+    letterSpacing: -0.2,
+    paddingTop: 30,
+    paddingBottom: 20,
+    paddingHorizontal: 5,
+    fontFamily: 'Oswald-Medium',
+  },
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+    borderRadius: 10,
+    shadowColor: '#171717',
+    elevation: 10,
+  },
+  contentContainerIos: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+    borderRadius: 10,
+    shadowColor: '#171717',
+    shadowOffset: { width: -2, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+  },
+});
 
 export default Player;

@@ -4,19 +4,19 @@ import { getInfo } from '../api/web-search-api';
 import ScreenContainer from '../components/screen-container';
 import bballCourt from '../assets/images/bball-court.jpg';
 import { teamsLogo } from '../constants/teams-logo';
-import { Skeleton, VStack, Box } from 'native-base';
-import TeamProfile from '../components/team-profile';
+import TeamProfile from '../components/team/team-profile';
+import { TeamPlaceholder } from '../components/placeholders';
 
 const Team = ({ route, navigation }) => {
   const [teamBasicInfo, setTeamBasicInfo] = useState({});
   const [teamDetailedInfo, setTeamDetailedInfo] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [initialMount, setInitialMount] = useState(true);
   const { itemId, itemName } = route.params;
 
   const fetchTeam = () => {
-    if (!itemId) return;
     console.log('fetching team');
+    if (!itemId) return;
     setIsLoading(true);
     let basic = {};
     getTeam(itemId)
@@ -24,12 +24,13 @@ const Team = ({ route, navigation }) => {
         const matchedLogo = teamsLogo.find((logo) => logo.id === team.data.id);
         basic = { ...team.data, logo: matchedLogo.logo };
         setTeamBasicInfo(basic);
-        // console.log('fetching team', basic);
         setIsLoading(false);
+        setInitialMount(false);
       })
       .catch((error) => {
         console.error(error);
         setIsLoading(false);
+        setInitialMount(false);
       });
   };
 
@@ -42,10 +43,12 @@ const Team = ({ route, navigation }) => {
       .then((data) => {
         setTeamDetailedInfo(data.Infobox.content);
         // console.log('team info', data.Infobox.content);
+        setInitialMount(false);
         setIsLoading(false);
       })
       .catch((error) => {
         console.error(error);
+        setInitialMount(false);
         setIsLoading(false);
       });
   };
@@ -62,6 +65,7 @@ const Team = ({ route, navigation }) => {
     const clearState = navigation.addListener('blur', () => {
       setTeamBasicInfo({});
       setTeamDetailedInfo([]);
+      setInitialMount(true);
       // run setParams to clear the route params so useEffect will run again if the same item is clicked
       navigation.setParams({ itemId: null, itemName: null });
     });
@@ -72,41 +76,12 @@ const Team = ({ route, navigation }) => {
     <ScreenContainer title={'Team'} navigation={navigation} image={bballCourt}>
       {!isLoading ? (
         <TeamProfile
+          initialMount={initialMount}
           teamBasicInfo={teamBasicInfo}
           teamDetailedInfo={teamDetailedInfo}
-          navigation={navigation}
         />
       ) : (
-        <Box mt="10" alignItems="center">
-          <VStack
-            w="90%"
-            maxW="400"
-            borderWidth="1"
-            space={8}
-            overflow="hidden"
-            rounded="md"
-            _dark={{
-              borderColor: 'coolGray.500',
-            }}
-            _light={{
-              borderColor: 'coolGray.200',
-            }}
-          >
-            <VStack alignItems="flex-end">
-              <Skeleton
-                m="4"
-                borderWidth={1}
-                borderColor="coolGray.200"
-                endColor="warmGray.50"
-                size="20"
-                rounded="md"
-              />
-              <Skeleton.Text mx="4" mb="4" lines={1} w="24" />
-            </VStack>
-
-            <Skeleton h="394px" />
-          </VStack>
-        </Box>
+        <TeamPlaceholder />
       )}
     </ScreenContainer>
   );

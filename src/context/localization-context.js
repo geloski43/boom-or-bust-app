@@ -5,7 +5,6 @@ const localizationReducer = (state, action) => {
   switch (action.type) {
     case 'set_timezone_name':
       return { ...state, timezoneName: action.payload };
-
     default:
       return state;
   }

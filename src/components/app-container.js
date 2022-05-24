@@ -1,9 +1,13 @@
 import React from 'react';
 import { NativeBaseProvider } from 'native-base';
 import theme from '../theme';
-import { Provider as LocalizationProvider } from '../context/localization-context';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Provider as ModalProvider } from '../context/modal-context';
+import { Provider as LocalizationProvider } from '../context/localization-context';
+import { Provider as StatsProvider } from '../context/stats-context';
+import { Provider as PlayerProvider } from '../context/player-context';
+import { Provider as GameProvider } from '../context/game-context';
 
 const colorModeManager = {
   get: async () => {
@@ -26,11 +30,22 @@ const colorModeManager = {
 const AppContainer = ({ children }) => {
   return (
     <NavigationContainer>
-      <LocalizationProvider>
-        <NativeBaseProvider colorModeManager={colorModeManager} theme={theme}>
-          {children}
-        </NativeBaseProvider>
-      </LocalizationProvider>
+      <GameProvider>
+        <PlayerProvider>
+          <StatsProvider>
+            <ModalProvider>
+              <LocalizationProvider>
+                <NativeBaseProvider
+                  colorModeManager={colorModeManager}
+                  theme={theme}
+                >
+                  {children}
+                </NativeBaseProvider>
+              </LocalizationProvider>
+            </ModalProvider>
+          </StatsProvider>
+        </PlayerProvider>
+      </GameProvider>
     </NavigationContainer>
   );
 };

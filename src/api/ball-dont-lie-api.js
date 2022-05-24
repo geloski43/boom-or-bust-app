@@ -20,7 +20,7 @@ export const getAverages = async (season, playerId) =>
 
 export const getStats = async (season, playerId, isPostSeason) =>
   await axios.get(
-    `https://www.balldontlie.io/api/v1/stats?seasons[]=${season}&player_ids[]=${playerId}&postseason=${isPostSeason}`
+    `https://www.balldontlie.io/api/v1/stats?&seasons[]=${season}&player_ids[]=${playerId}&postseason=${isPostSeason}&per_page=100`
   );
 
 export const getTeams = async () =>
