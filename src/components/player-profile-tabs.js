@@ -70,10 +70,10 @@ const PlayerProfiletabs = ({
                 )}
 
                 {typeof v.value === 'string' &&
-                v.data_type !== 'instagram_profile' &&
-                v.data_type !== 'twitter_profile' &&
-                v.data_type !== 'official_website' &&
-                v.data_type !== 'facebook_profile' ? (
+                  v.data_type !== 'instagram_profile' &&
+                  v.data_type !== 'twitter_profile' &&
+                  v.data_type !== 'official_website' &&
+                  v.data_type !== 'facebook_profile' ? (
                   <Text
                     color="coolGray.600"
                     _dark={{
@@ -89,23 +89,23 @@ const PlayerProfiletabs = ({
                       v.data_type === 'instagram_profile'
                         ? `https://www.instagram.com/${v.value}`
                         : v.data_type === 'twitter_profile'
-                        ? `https://twitter.com/${v.value}`
-                        : v.data_type === 'facebook_profile'
-                        ? `https://www.facebook.com/${v.value}`
-                        : v.data_type === 'official_website'
-                        ? v.value
-                        : null
+                          ? `https://twitter.com/${v.value}`
+                          : v.data_type === 'facebook_profile'
+                            ? `https://www.facebook.com/${v.value}`
+                            : v.data_type === 'official_website'
+                              ? v.value
+                              : null
                     }
                   >
                     {v.data_type === 'instagram_profile'
                       ? `https://www.instagram.com/${v.value}`
                       : v.data_type === 'twitter_profile'
-                      ? `https://twitter.com/${v.value}`
-                      : v.data_type === 'facebook_profile'
-                      ? `https://www.facebook.com/${v.value}`
-                      : v.data_type === 'official_website'
-                      ? v.value
-                      : null}
+                        ? `https://twitter.com/${v.value}`
+                        : v.data_type === 'facebook_profile'
+                          ? `https://www.facebook.com/${v.value}`
+                          : v.data_type === 'official_website'
+                            ? v.value
+                            : null}
                   </Link>
                 )}
               </Container>
@@ -125,7 +125,7 @@ const PlayerProfiletabs = ({
 
   const PlayerAverages = () => (
     <ScrollView
-      keyboardShouldPersistTaps="always"
+      // keyboardShouldPersistTaps="always"
       borderRadius="xl"
       bg="muted.100"
       _dark={{ bg: 'muted.600' }}
@@ -137,7 +137,7 @@ const PlayerProfiletabs = ({
         alignItems="center"
         justifyContent="center"
       >
-        <NumericInput
+        {/* <NumericInput
           value={parseInt(season)}
           onChange={handleChangeSeason}
           onLimitReached={(isMax, msg) => console.log(isMax, msg)}
@@ -151,8 +151,8 @@ const PlayerProfiletabs = ({
           iconStyle={{ color: 'white' }}
           rightButtonBackgroundColor="#EA3788"
           leftButtonBackgroundColor="#E56B70"
-        />
-        {/* <Button onPress={() => fetchAverage()} size="xs">
+        /> */}
+        <Button onPress={() => fetchAverage()} size="xs">
           <Text fontFamily="Oswald-Regular" fontSize="14px">
             Get Averages
           </Text>
@@ -174,7 +174,7 @@ const PlayerProfiletabs = ({
           onChangeText={handleChangeSeason}
           value={season}
           placeholder="Season"
-        /> */}
+        />
         {/* <VStack>
           <IconButton
             onPress={() => setSeason((parseInt(season) + 1).toString())}
@@ -274,15 +274,6 @@ const PlayerProfiletabs = ({
   };
 
   return (
-<<<<<<< HEAD
-    <TabView
-      navigationState={{ index, routes }}
-      renderScene={renderScene}
-      onIndexChange={setIndex}
-      initialLayout={initialLayout}
-      style={styles.container}
-    />
-=======
     <Box mt="-10px" flex={1}>
       <TabView
         renderTabBar={renderTabBar}
@@ -293,7 +284,6 @@ const PlayerProfiletabs = ({
         style={{ marginTop: StatusBar.currentHeight }}
       />
     </Box>
->>>>>>> 4d1c91f64d3f7dc66fd0c929332e427dbf2a7ac7
   );
 };
 
