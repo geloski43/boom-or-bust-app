@@ -1,19 +1,16 @@
-import React, { useContext, useState } from 'react';
-import {
-  Text,
-  View,
-  Animated,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
-import { responsiveWidth, responsiveHeight, width } from '../../utils/utils';
-import { Icon, Button } from 'native-base';
-import { Ionicons } from '@expo/vector-icons';
-import { Context as ModalContext } from '../../context/modal-context';
+import React, { useState } from 'react';
+import { Text, View, Animated, StyleSheet } from 'react-native';
+import { responsiveWidth, responsiveHeight } from '../../utils/utils';
 import BackButton from '../back-button';
 
-const Header = ({ player, fullName, scrollY, colorMode, scrollPosition }) => {
-  const modalContext = useContext(ModalContext);
+const Header = ({
+  player,
+  fullName,
+  scrollY,
+  colorMode,
+  scrollPosition,
+  renderSeasonOption,
+}) => {
   const [imageStatus, setImageStatus] = useState('Not Loaded');
 
   const [beforeFadeImg, startFadeImg, finishFadeImg] = [
@@ -103,34 +100,38 @@ const Header = ({ player, fullName, scrollY, colorMode, scrollPosition }) => {
           opacity: nameOpacity,
         }}
       >
-        <Button
-          _pressed={{ colorScheme: 'dark', borderRadius: 'full' }}
-          variant="ghost"
-          onPress={() => {
-            setTimeout(() => {
-              modalContext.openSeasonOptionModal();
-            }, 900)
-          }}
-          _dark={{ colorScheme: 'blueGray' }}
-          m="1"
-          leftIcon={
-            <Icon
-              mt="5"
-              mr={width * 0.05}
-              size="23px"
-              as={Ionicons}
-              name="options-outline"
-              color="darkBlue.500"
-              _dark={{
-                color: 'warmGray.50',
-              }}
-            />
-          }
-        />
+<<<<<<< HEAD
+<Button
+  _pressed={{ colorScheme: 'dark', borderRadius: 'full' }}
+  variant="ghost"
+  onPress={() => {
+    setTimeout(() => {
+      modalContext.openSeasonOptionModal();
+    }, 900)
+  }}
+  _dark={{ colorScheme: 'blueGray' }}
+  m="1"
+  leftIcon={
+    <Icon
+      mt="5"
+      mr={width * 0.05}
+      size="23px"
+      as={Ionicons}
+      name="options-outline"
+      color="darkBlue.500"
+      _dark={{
+        color: 'warmGray.50',
+      }}
+    />
+  }
+/>
 
 
-      </Animated.View>
-    </View>
+=======
+        {renderSeasonOption('25', '22px', 'right top')}
+>>>>>>> 4dfdd50573e07f658303ad63cfbd1064cbead92f
+      </Animated.View >
+    </View >
   );
 };
 

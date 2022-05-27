@@ -61,7 +61,11 @@ const GamelistFilter = ({
           )}
           {Platform.OS === 'ios' && (
             <DateTimePicker
+<<<<<<< HEAD
               style={{ width: 78, backgroundColor: 'white', marginTop: 5 }}
+=======
+              style={{ width: 74, backgroundColor: 'white', marginTop: 5 }}
+>>>>>>> 4dfdd50573e07f658303ad63cfbd1064cbead92f
               value={dateToSearch}
               mode="date"
               display="default"

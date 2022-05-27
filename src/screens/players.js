@@ -19,7 +19,10 @@ const Players = ({ navigation }) => {
   const [pagesTotal, setPagesTotal] = useState(null);
   const [hasPagination, setHasPagination] = useState(true);
   const [initialMount, setInitialMount] = useState(true);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4dfdd50573e07f658303ad63cfbd1064cbead92f
 
   const playerlistRef = useRef();
 
