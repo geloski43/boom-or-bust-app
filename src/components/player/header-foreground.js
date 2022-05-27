@@ -281,23 +281,25 @@ const HeaderForeground = ({
                 w="105px"
               />
             )}
-            <TouchableOpacity
-              onPress={() => {
-                modalContext.openSeasonOptionModal();
-              }}
-            >
-              <Icon
-                ml={responsiveWidth(12)}
-                mt="-15px"
-                size="33px"
-                as={Ionicons}
-                name="options-outline"
-                color="darkBlue.500"
-                _dark={{
-                  color: 'warmGray.50',
+            <Animated.View>
+              <TouchableOpacity
+                onPress={() => {
+                  modalContext.openSeasonOptionModal();
                 }}
-              />
-            </TouchableOpacity>
+              >
+                <Icon
+                  ml={responsiveWidth(12)}
+                  mt="-15px"
+                  size="33px"
+                  as={Ionicons}
+                  name="options-outline"
+                  color="darkBlue.500"
+                  _dark={{
+                    color: 'warmGray.50',
+                  }}
+                />
+              </TouchableOpacity>
+            </Animated.View>
           </Animated.View>
         </>
       </Animated.View>

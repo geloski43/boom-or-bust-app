@@ -54,9 +54,9 @@ const PlayerProfiletabs = ({
     return (
       <ScrollView borderRadius="xl" bg="muted.100" _dark={{ bg: 'muted.600' }}>
         {playerDetailedInfo ? (
-          <VStack flex={1} space={3}>
+          <VStack space={3}>
             {playerDetailedInfo.map((v, i) => (
-              <Container p="2" flex={1} key={i} alignItems="flex-start">
+              <Container p="2" key={i} alignItems="flex-start">
                 {v.label !== 'Instance of' && (
                   <Text
                     color="coolGray.600"
@@ -132,7 +132,7 @@ const PlayerProfiletabs = ({
     >
       <Stack
         my="2"
-        flex={1}
+
         direction="row"
         alignItems="center"
         justifyContent="center"
@@ -247,7 +247,7 @@ const PlayerProfiletabs = ({
               key={route.key}
               borderBottomWidth="3"
               borderColor={borderColor}
-              flex={1}
+
               alignItems="center"
               p="2"
             >
@@ -274,7 +274,7 @@ const PlayerProfiletabs = ({
   };
 
   return (
-    <Box mt="-10px" flex={1}>
+    <Box mt="-10px" >
       <TabView
         renderTabBar={renderTabBar}
         navigationState={{ index, routes }}

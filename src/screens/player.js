@@ -117,7 +117,7 @@ const Player = ({ route, navigation }) => {
           convertedMins:
             obj.min && obj.min.includes(':')
               ? parseInt(obj.min.slice(0, 2)) +
-                  parseInt(obj.min.slice(-2)) / 60 || 0
+              parseInt(obj.min.slice(-2)) / 60 || 0
               : parseInt(obj.min) || 0,
         }));
         // we add teamlogo and teamid props,
@@ -285,12 +285,12 @@ const Player = ({ route, navigation }) => {
           // test if value has a number in it
           header =
             /\d/.test(listedHeight.value.slice(0, 1)) &&
-            /\d/.test(listedHeight.value.slice(5, -3)) &&
-            /\d/.test(listedWeight.value)
+              /\d/.test(listedHeight.value.slice(5, -3)) &&
+              /\d/.test(listedWeight.value)
               ? `${listedHeight.value.slice(0, 1)}'${listedHeight.value.slice(
-                  5,
-                  -3
-                )}",${listedWeight.value}s`
+                5,
+                -3
+              )}",${listedWeight.value}s`
               : biometrics;
           year = /\d/.test(parseInt(yearDrafted.value.slice(0, 4)))
             ? parseInt(yearDrafted.value.slice(0, 4))
@@ -348,6 +348,15 @@ const Player = ({ route, navigation }) => {
       />
     );
   };
+
+  const onLayoutContent = (e, title) => {
+    const contentHeightTmp = { ...contentHeight };
+    contentHeightTmp[title] = e.nativeEvent.layout.height;
+
+    setContentHeight({
+      ...contentHeightTmp
+    });
+  };
   // for ios marginBottom
   const calcMargin = (title) => {
     let marginBottom = 50;
@@ -368,14 +377,16 @@ const Player = ({ route, navigation }) => {
   };
 
   // wrapper for rendered component tab
-  const RenderContent = ({ title, children }) => {
+
+  const renderProfile = (title) => {
     const marginBottom = Platform.select({
       ios: calcMargin(title),
       android: 0,
     });
 
     return (
-      <Box
+      <View
+        onLayout={(e) => onLayoutContent(e, title)}
         style={[
           Platform.OS === 'android'
             ? styles.contentContainer
@@ -392,7 +403,12 @@ const Player = ({ route, navigation }) => {
           </Text>
         )}
 
-        {children}
+        <PlayerProfileTab
+          averages={averages}
+          playerProfile={playerProfile}
+          isLoading={quickLoading}
+          initialMount={initialMount}
+        />
         <SeasonOptionModal
           setSeason={setSeason}
           fetchStats={fetchStats}
@@ -401,9 +417,61 @@ const Player = ({ route, navigation }) => {
           season={season}
           isPostSeason={isPostSeason}
         />
-      </Box>
+      </View>
     );
   };
+
+
+  const renderAverages = (title) => {
+    const marginBottom = Platform.select({
+      ios: calcMargin(title),
+      android: 0,
+    });
+
+    return (
+      <View
+        onLayout={(e) => onLayoutContent(e, title)}
+        style={[
+          Platform.OS === 'android'
+            ? styles.contentContainer
+            : styles.contentContainerIos,
+          {
+            marginBottom,
+            backgroundColor: contentBackground,
+          },
+        ]}
+      >
+        {gamesPlayed !== 0 && (
+          <Text style={[styles.contentTitle, { color: textColor }]}>
+            {title}
+          </Text>
+        )}
+        <PlayerAveragesTab
+          colorMode={colorMode}
+          allStats={stats}
+          groupedStats={groupedStats}
+          season={season}
+          initialMount={initialMount}
+          isPostSeason={isPostSeason}
+          isLoading={slowLoading}
+          subLoading={subLoading}
+          teamData={teamData}
+          totalGamesPlayed={gamesPlayed}
+        />
+        <SeasonOptionModal
+          setSeason={setSeason}
+          fetchStats={fetchStats}
+          setIsPostSeason={setIsPostSeason}
+          player={player}
+          season={season}
+          isPostSeason={isPostSeason}
+        />
+      </View>
+    );
+  };
+
+
+
 
   // parallax top header
   const renderHeader = () => (
@@ -415,6 +483,9 @@ const Player = ({ route, navigation }) => {
       scrollPosition={scrollPosition}
     />
   );
+
+
+
 
   // parallax header foreground
   const renderForeground = () => (
@@ -477,93 +548,46 @@ const Player = ({ route, navigation }) => {
   }, [navigation]);
 
   return (
-    <>
-      <StickyParallaxHeader
-        foreground={renderForeground()}
-        header={renderHeader()}
-        tabs={[
-          {
-            title: 'Profile',
-            content: (
-              <RenderContent
-                title={
-                  playerProfile && playerProfile.length > 0 && !quickLoading
-                    ? 'Player profile'
-                    : ''
-                }
-              >
-                <PlayerProfileTab
-                  averages={averages}
-                  playerProfile={playerProfile}
-                  isLoading={quickLoading}
-                  initialMount={initialMount}
-                />
-              </RenderContent>
-            ),
-          },
-          {
-            title: 'Averages',
-            content: (
-              <RenderContent
-                title={
-                  averages.length > 0 && !slowLoading ? 'Player averages' : ''
-                }
-              >
-                <PlayerAveragesTab
-                  colorMode={colorMode}
-                  allStats={stats}
-                  groupedStats={groupedStats}
-                  season={season}
-                  initialMount={initialMount}
-                  isPostSeason={isPostSeason}
-                  isLoading={slowLoading}
-                  subLoading={subLoading}
-                  teamData={teamData}
-                  totalGamesPlayed={gamesPlayed}
-                />
-              </RenderContent>
-            ),
-          },
-          {
-            title: 'Game Stats',
-            content: <Text>averages{initialMount.toString()}</Text>,
-          },
-        ]}
-        background={renderBackground()}
-        deviceWidth={width}
-        parallaxHeight={responsiveHeight(50)}
-        scrollEvent={event(
-          [{ nativeEvent: { contentOffset: { y: scrollY.y } } }],
-          { useNativeDriver: false }
-        )}
-        headerSize={setHeaderSize}
-        headerHeight={responsiveHeight(13)}
-        tabTextStyle={[styles.tabText, { fontSize: lgTextSize }]}
-        tabTextContainerStyle={{
-          backgroundColor: 'transparent',
-          borderRadius: 18,
-        }}
-        tabTextContainerActiveStyle={{
-          backgroundColor: colorMode === 'dark' ? '#374151' : '#e5e7eb',
-        }}
-        tabsWrapperStyle={{ paddingVertical: 12 }}
-      >
-        <RenderContent
-          title={
-            playerProfile && playerProfile.length > 0 && !quickLoading
-              ? 'Player profile'
-              : ''
-          }
-        >
-          <PlayerProfileTab
-            averages={averages}
-            playerProfile={playerProfile}
-            isLoading={quickLoading}
-            initialMount={initialMount}
-          />
-        </RenderContent>
-      </StickyParallaxHeader>
-    </>
+
+    <StickyParallaxHeader
+      foreground={renderForeground()}
+      header={renderHeader()}
+      tabs={[
+        {
+          title: 'Profile',
+          content: renderProfile("Player profile")
+        },
+        {
+          title: 'Averages',
+          content: renderAverages("Player averages")
+        },
+        // {
+        //   title: 'Game Stats',
+        //   content: renderGameStats()
+        // },
+      ]}
+      background={renderBackground()}
+      deviceWidth={width}
+      parallaxHeight={responsiveHeight(50)}
+      scrollEvent={event(
+        [{ nativeEvent: { contentOffset: { y: scrollY.y } } }],
+        { useNativeDriver: false }
+      )}
+      headerSize={setHeaderSize}
+      headerHeight={responsiveHeight(13)}
+      tabTextStyle={[styles.tabText, { fontSize: lgTextSize }]}
+      tabTextContainerStyle={{
+        backgroundColor: 'transparent',
+        borderRadius: 18,
+      }}
+      tabTextContainerActiveStyle={{
+        backgroundColor: colorMode === 'dark' ? '#374151' : '#e5e7eb',
+      }}
+      tabsWrapperStyle={{ paddingVertical: 12 }}
+    >
+      {renderProfile("Player profile")}
+    </StickyParallaxHeader>
+
   );
 };
 

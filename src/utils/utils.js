@@ -20,7 +20,7 @@ export const parseDate = (input) => {
 
 export const dayToShow = (date, timezone) => {
   const selectedLocales =
-    timezone.includes('Asia') && timezone.includes('America');
+    timezone.includes('Asia') || timezone.includes('America');
   const day = parseDate(date).getDate();
   const month = parseDate(date).getMonth() + 1;
   const today = new Date().getDate();
@@ -29,14 +29,14 @@ export const dayToShow = (date, timezone) => {
   return day === today && month === currentMonth && selectedLocales
     ? `Today`
     : ((day === today + 1 && month === currentMonth) ||
-        month === currentMonth + 1) &&
+      month === currentMonth + 1) &&
       selectedLocales
-    ? `Tomorrow`
-    : ((day === today - 1 && month === currentMonth) ||
+      ? `Tomorrow`
+      : ((day === today - 1 && month === currentMonth) ||
         month === currentMonth - 1) &&
-      selectedLocales
-    ? `Yesterday`
-    : days[parseDate(date).getDay()];
+        selectedLocales
+        ? `Yesterday`
+        : days[parseDate(date).getDay()];
 };
 
 export const teamLogo = (id, team) => {

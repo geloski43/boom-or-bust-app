@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { responsiveWidth, responsiveHeight, width } from '../../utils/utils';
-import { Icon } from 'native-base';
+import { Icon, Button } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 import { Context as ModalContext } from '../../context/modal-context';
 import BackButton from '../back-button';
@@ -62,11 +62,11 @@ const Header = ({ player, fullName, scrollY, colorMode, scrollPosition }) => {
           source={
             imageStatus !== 'Loaded'
               ? {
-                  uri: 'https://via.placeholder.com/32/BBC2CC/BBC2CC?text=.....',
-                }
+                uri: 'https://via.placeholder.com/32/BBC2CC/BBC2CC?text=.....',
+              }
               : {
-                  uri: player && player.playerImage,
-                }
+                uri: player && player.playerImage,
+              }
           }
           style={[
             styles.headerPic,
@@ -103,23 +103,32 @@ const Header = ({ player, fullName, scrollY, colorMode, scrollPosition }) => {
           opacity: nameOpacity,
         }}
       >
-        <TouchableOpacity
+        <Button
+          _pressed={{ colorScheme: 'dark', borderRadius: 'full' }}
+          variant="ghost"
           onPress={() => {
-            modalContext.openSeasonOptionModal();
+            setTimeout(() => {
+              modalContext.openSeasonOptionModal();
+            }, 900)
           }}
-        >
-          <Icon
-            mt="5"
-            mr={width * 0.05}
-            size="23px"
-            as={Ionicons}
-            name="options-outline"
-            color="darkBlue.500"
-            _dark={{
-              color: 'warmGray.50',
-            }}
-          />
-        </TouchableOpacity>
+          _dark={{ colorScheme: 'blueGray' }}
+          m="1"
+          leftIcon={
+            <Icon
+              mt="5"
+              mr={width * 0.05}
+              size="23px"
+              as={Ionicons}
+              name="options-outline"
+              color="darkBlue.500"
+              _dark={{
+                color: 'warmGray.50',
+              }}
+            />
+          }
+        />
+
+
       </Animated.View>
     </View>
   );

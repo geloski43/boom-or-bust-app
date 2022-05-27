@@ -5,7 +5,6 @@ import bballGame from '../assets/images/bball-game.jpg';
 import PlayerList from '../components/players/player-list';
 import { PlayersPlaceholder } from '../components/placeholders';
 import { genericPlayerImage, findPlayerImage } from '../utils/utils';
-import { Keyboard, Platform } from 'react-native';
 import { Context as PlayerContext } from '../context/player-context';
 import PlayerSearchbar from '../components/players/player-searchbar';
 
@@ -20,9 +19,7 @@ const Players = ({ navigation }) => {
   const [pagesTotal, setPagesTotal] = useState(null);
   const [hasPagination, setHasPagination] = useState(true);
   const [initialMount, setInitialMount] = useState(true);
-  const [keyboardStatus, setKeyboardStatus] = useState('Keyboard Hidden');
-  const _keyboardDidShow = () => setKeyboardStatus('Keyboard Shown');
-  const _keyboardDidHide = () => setKeyboardStatus('Keyboard Hidden');
+
 
   const playerlistRef = useRef();
 
@@ -130,25 +127,7 @@ const Players = ({ navigation }) => {
 
   useEffect(() => {
     fetchPlayers();
-    Keyboard.addListener('keyboardDidShow', _keyboardDidShow);
-    Keyboard.addListener('keyboardDidHide', _keyboardDidHide);
   }, []);
-
-  useEffect(() => {
-    const showSubscription = Keyboard.addListener(
-      'keyboardDidShow',
-      _keyboardDidShow
-    );
-    const hideSubscription = Keyboard.addListener(
-      'keyboardDidHide',
-      _keyboardDidHide
-    );
-    const clearListeners = navigation.addListener('blur', () => {
-      showSubscription.remove();
-      hideSubscription.remove();
-    });
-    return clearListeners;
-  }, [navigation]);
 
   return (
     <ScreenContainer
@@ -168,10 +147,6 @@ const Players = ({ navigation }) => {
             players={players}
           />
           <PlayerList
-            moveToTop={moveToTop}
-            moveToIndex={moveToIndex}
-            playerlistRef={playerlistRef}
-            keyboardStatus={keyboardStatus}
             data={players}
             fetchPlayers={fetchPlayers}
             isFetchingMore={isFetchingMore}
@@ -182,7 +157,7 @@ const Players = ({ navigation }) => {
             setPage={setPage}
             hasPagination={hasPagination}
             initialMount={initialMount}
-            searchPlayerByName={searchPlayerByName}
+            playerlistRef={playerlistRef}
           />
         </>
       ) : (

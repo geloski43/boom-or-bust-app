@@ -22,7 +22,7 @@ const PlayerProfileTab = ({
   return (
     <>
       {!isLoading ? (
-        <ScrollView>
+        <>
           {playerProfile && playerProfile.length > 0 ? (
             <VStack flex={1} space={3}>
               {playerProfile.map((v, i) => (
@@ -40,10 +40,10 @@ const PlayerProfileTab = ({
                   )}
 
                   {typeof v.value === 'string' &&
-                  v.data_type !== 'instagram_profile' &&
-                  v.data_type !== 'twitter_profile' &&
-                  v.data_type !== 'official_website' &&
-                  v.data_type !== 'facebook_profile' ? (
+                    v.data_type !== 'instagram_profile' &&
+                    v.data_type !== 'twitter_profile' &&
+                    v.data_type !== 'official_website' &&
+                    v.data_type !== 'facebook_profile' ? (
                     <Text
                       color="coolGray.600"
                       _dark={{
@@ -59,23 +59,23 @@ const PlayerProfileTab = ({
                         v.data_type === 'instagram_profile'
                           ? `https://www.instagram.com/${v.value}`
                           : v.data_type === 'twitter_profile'
-                          ? `https://twitter.com/${v.value}`
-                          : v.data_type === 'facebook_profile'
-                          ? `https://www.facebook.com/${v.value}`
-                          : v.data_type === 'official_website'
-                          ? v.value
-                          : null
+                            ? `https://twitter.com/${v.value}`
+                            : v.data_type === 'facebook_profile'
+                              ? `https://www.facebook.com/${v.value}`
+                              : v.data_type === 'official_website'
+                                ? v.value
+                                : null
                       }
                     >
                       {v.data_type === 'instagram_profile'
                         ? `https://www.instagram.com/${v.value}`
                         : v.data_type === 'twitter_profile'
-                        ? `https://twitter.com/${v.value}`
-                        : v.data_type === 'facebook_profile'
-                        ? `https://www.facebook.com/${v.value}`
-                        : v.data_type === 'official_website'
-                        ? v.value
-                        : null}
+                          ? `https://twitter.com/${v.value}`
+                          : v.data_type === 'facebook_profile'
+                            ? `https://www.facebook.com/${v.value}`
+                            : v.data_type === 'official_website'
+                              ? v.value
+                              : null}
                     </Link>
                   )}
                 </Container>
@@ -102,7 +102,7 @@ const PlayerProfileTab = ({
               )}
             </>
           )}
-        </ScrollView>
+        </>
       ) : (
         <Center py={padding}>
           <HStack space={2} justifyContent="center">
