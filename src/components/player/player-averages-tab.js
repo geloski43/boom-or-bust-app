@@ -498,6 +498,7 @@ const PlayerAveragesTab = ({
     <>
       {!isLoading ? (
         <FlatList
+          scrollEnabled={false}
           data={dataArray}
           renderItem={renderItem}
           ListHeaderComponent={renderHeader}

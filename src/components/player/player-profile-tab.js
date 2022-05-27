@@ -84,7 +84,7 @@ const PlayerProfileTab = ({
             <>
               {!initialMount && (
                 <Stack
-                  py={padding}
+                  py="25%"
                   direction="row"
                   justifyContent="center"
                   space={2}
@@ -95,7 +95,7 @@ const PlayerProfileTab = ({
                     fontFamily="Oswald-Regular"
                     color="red.400"
                   >
-                    No data available
+                    No profile data available
                   </Text>
                 </Stack>
               )}

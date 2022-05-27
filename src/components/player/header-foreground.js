@@ -279,7 +279,7 @@ const HeaderForeground = ({
                 w="105px"
               />
             )}
-            {renderSeasonOption('30', '-12px')}
+            {renderSeasonOption('30', '-12px', 'right bottom')}
           </Animated.View>
         </>
       </Animated.View>

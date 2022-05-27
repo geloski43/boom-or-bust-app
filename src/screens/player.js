@@ -387,9 +387,10 @@ const Player = ({ route, navigation }) => {
     return marginBottom;
   };
 
-  const renderSeasonOption = (size, margin) => {
+  const renderSeasonOption = (size, margin, placement) => {
     return (
       <SeasonOption
+        placement={placement}
         margin={margin}
         size={size}
         setSeason={setSeason}
@@ -423,7 +424,7 @@ const Player = ({ route, navigation }) => {
           },
         ]}
       >
-        {gamesPlayed !== 0 && (
+        {playerProfile.length > 0 && (
           <Text style={[styles.contentTitle, { color: textColor }]}>
             {title}
           </Text>

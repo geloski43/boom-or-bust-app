@@ -100,7 +100,7 @@ const Header = ({
           opacity: nameOpacity,
         }}
       >
-        {renderSeasonOption('25', '22px')}
+        {renderSeasonOption('25', '22px', 'right top')}
       </Animated.View>
     </View>
   );

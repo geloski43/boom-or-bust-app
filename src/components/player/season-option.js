@@ -22,6 +22,7 @@ const SeasonOption = ({
   setTruthy,
   size,
   margin,
+  placement,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -29,7 +30,7 @@ const SeasonOption = ({
 
   return (
     <Popover
-      placement="top right"
+      placement={placement}
       trigger={(triggerProps) => {
         return (
           <Button
@@ -69,7 +70,7 @@ const SeasonOption = ({
                 type="up-down"
                 value={num}
                 onChange={(value) => setNum(value)}
-                totalWidth={200}
+                totalWidth={197}
                 totalHeight={50}
                 step={1}
                 valueType="real"

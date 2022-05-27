@@ -61,7 +61,7 @@ const GamelistFilter = ({
           )}
           {Platform.OS === 'ios' && (
             <DateTimePicker
-              style={{ width: 74, backgroundColor: 'white' }}
+              style={{ width: 74, backgroundColor: 'white', marginTop: 5 }}
               value={dateToSearch}
               mode="date"
               display="default"
@@ -163,7 +163,7 @@ const GamelistFilter = ({
           )}
           {Platform.OS === 'ios' && (
             <DateTimePicker
-              style={{ width: 74, backgroundColor: 'white' }}
+              style={{ width: 74, backgroundColor: 'white', marginTop: 5 }}
               value={dateToSearch}
               mode="date"
               display="default"
