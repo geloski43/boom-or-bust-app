@@ -49,6 +49,8 @@ const PlayerSearchbar = ({
           Please enter a name
         </FormControl.ErrorMessage>
         <Input
+          // only in ios
+          h={playerSearchError ? (Platform.OS === 'ios' ? '45px' : '') : '40px'}
           onSubmitEditing={() => {
             setPage(1);
             searchPlayerByName(query);
