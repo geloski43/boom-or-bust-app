@@ -4,7 +4,7 @@ import { getInfo } from '../api/web-search-api';
 import { Text, View, Animated, StyleSheet, Platform } from 'react-native';
 import StickyParallaxHeader from 'react-native-sticky-parallax-header';
 import { useColorMode, Box } from 'native-base';
-import SeasonOptionModal from '../components/player/season-option-modal';
+import SeasonOption from '../components/player/season-option';
 import PlayerProfileTab from '../components/player/player-profile-tab';
 import PlayerAveragesTab from '../components/player/player-averages-tab';
 import HeaderForeground from '../components/player/header-foreground';
@@ -49,9 +49,15 @@ const Player = ({ route, navigation }) => {
   const [playerHeaderText, setPlayerHeaderText] = useState(biometrics);
   const [teamData, setTeamData] = useState([]);
 
+  // we need this to show season data inside the option pop up
+  const [num, setNum] = useState(parseInt(new Date().getFullYear()));
+  const [truthy, setTruthy] = useState(false);
+
   const fetchPlayer = () => {
-    console.log('fetching player');
-    if (!itemId) return;
+    if (!itemId) {
+      console.log('route params and state have been reset');
+      return;
+    }
     setQuickLoading(true);
     let obj = {};
     getPlayer(itemId)
@@ -242,6 +248,7 @@ const Player = ({ route, navigation }) => {
         ]);
         // we use this to group stats by team so we can easily select data for a single team
         setGroupedStats(groupBy(gameStats, 'teamId'));
+        console.log('has data', groupBy(gameStats, 'teamId'));
         // we use this to display total stats if there are multiple teams
         setStats(gameStats);
         if (initialMount) {
@@ -263,10 +270,12 @@ const Player = ({ route, navigation }) => {
   };
 
   const fetchProfile = () => {
-    console.log('fetching player info');
     let year = 0;
     let header = '';
-    if (!fullName) return;
+    if (!fullName) {
+      console.log('route params and state have been reset');
+      return;
+    }
     setQuickLoading(true);
     getInfo(fullName)
       .then((response) => response.json())
@@ -297,12 +306,14 @@ const Player = ({ route, navigation }) => {
             : season - 1;
           setPlayerHeaderText(header);
           setSeason(year);
+          setNum(year);
           setPlayerProfile(data.Infobox.content);
           fetchStats(year, itemId, isPostSeason);
         } else {
           console.log('there is no profile info listedweight is', listedWeight);
           setPlayerHeaderText(biometrics);
           setSeason(season - 1);
+          setNum(season - 1);
           fetchStats(season - 1, itemId, isPostSeason);
         }
       })
@@ -348,6 +359,15 @@ const Player = ({ route, navigation }) => {
       />
     );
   };
+  const onLayoutContent = (e, title) => {
+    const contentHeightTmp = { ...contentHeight };
+    contentHeightTmp[title] = e.nativeEvent.layout.height;
+
+    setContentHeight({
+      ...contentHeightTmp,
+    });
+  };
+
   // for ios marginBottom
   const calcMargin = (title) => {
     let marginBottom = 50;
@@ -367,8 +387,24 @@ const Player = ({ route, navigation }) => {
     return marginBottom;
   };
 
-  // wrapper for rendered component tab
-  const RenderContent = ({ title, children }) => {
+  const renderSeasonOption = (size, margin) => {
+    return (
+      <SeasonOption
+        margin={margin}
+        size={size}
+        setSeason={setSeason}
+        fetchStats={fetchStats}
+        setIsPostSeason={setIsPostSeason}
+        player={player}
+        num={num}
+        setNum={setNum}
+        truthy={truthy}
+        setTruthy={setTruthy}
+      />
+    );
+  };
+
+  const renderProfile = (title) => {
     const marginBottom = Platform.select({
       ios: calcMargin(title),
       android: 0,
@@ -376,6 +412,7 @@ const Player = ({ route, navigation }) => {
 
     return (
       <Box
+        onLayout={(e) => onLayoutContent(e, title)}
         style={[
           Platform.OS === 'android'
             ? styles.contentContainer
@@ -392,15 +429,81 @@ const Player = ({ route, navigation }) => {
           </Text>
         )}
 
-        {children}
-        <SeasonOptionModal
-          setSeason={setSeason}
-          fetchStats={fetchStats}
-          setIsPostSeason={setIsPostSeason}
-          player={player}
-          season={season}
-          isPostSeason={isPostSeason}
+        <PlayerProfileTab
+          averages={averages}
+          playerProfile={playerProfile}
+          isLoading={quickLoading}
+          initialMount={initialMount}
         />
+      </Box>
+    );
+  };
+
+  const renderAverages = (title) => {
+    const marginBottom = Platform.select({
+      ios: calcMargin(title),
+      android: 0,
+    });
+
+    return (
+      <Box
+        onLayout={(e) => onLayoutContent(e, title)}
+        style={[
+          Platform.OS === 'android'
+            ? styles.contentContainer
+            : styles.contentContainerIos,
+          {
+            marginBottom,
+            backgroundColor: contentBackground,
+          },
+        ]}
+      >
+        {gamesPlayed !== 0 && (
+          <Text style={[styles.contentTitle, { color: textColor }]}>
+            {title}
+          </Text>
+        )}
+        <PlayerAveragesTab
+          colorMode={colorMode}
+          allStats={stats}
+          groupedStats={groupedStats}
+          season={season}
+          initialMount={initialMount}
+          isPostSeason={isPostSeason}
+          isLoading={slowLoading}
+          subLoading={subLoading}
+          teamData={teamData}
+          totalGamesPlayed={gamesPlayed}
+        />
+      </Box>
+    );
+  };
+
+  const renderGameStats = (title) => {
+    const marginBottom = Platform.select({
+      ios: calcMargin(title),
+      android: 0,
+    });
+
+    return (
+      <Box
+        onLayout={(e) => onLayoutContent(e, title)}
+        style={[
+          Platform.OS === 'android'
+            ? styles.contentContainer
+            : styles.contentContainerIos,
+          {
+            marginBottom,
+            backgroundColor: contentBackground,
+          },
+        ]}
+      >
+        {gamesPlayed !== 0 && (
+          <Text style={[styles.contentTitle, { color: textColor }]}>
+            {title}
+          </Text>
+        )}
+        <Text>{JSON.stringify(stats)}</Text>
       </Box>
     );
   };
@@ -408,6 +511,7 @@ const Player = ({ route, navigation }) => {
   // parallax top header
   const renderHeader = () => (
     <Header
+      renderSeasonOption={renderSeasonOption}
       player={player}
       fullName={fullName}
       scrollY={scrollY}
@@ -421,10 +525,10 @@ const Player = ({ route, navigation }) => {
     <>
       {!slowLoading && !initialMount ? (
         <HeaderForeground
+          renderSeasonOption={renderSeasonOption}
           scrollPosition={scrollPosition}
           averages={averages}
           scrollY={scrollY}
-          colorMode={colorMode}
           fullName={fullName}
           player={player}
           playerHeaderText={playerHeaderText}
@@ -460,6 +564,7 @@ const Player = ({ route, navigation }) => {
   // it wont show the previous data
   useEffect(() => {
     const clearState = navigation.addListener('blur', () => {
+      console.log('unmounting...');
       setPlayer({});
       setPlayerProfile([]);
       setStats([]);
@@ -467,6 +572,8 @@ const Player = ({ route, navigation }) => {
       setAverages([]);
       setIsPostSeason(false);
       setSeason(new Date().getFullYear());
+      setNum(new Date().getFullYear());
+      setTruthy(false);
       setGamesPlayed(0);
       setInitialMount(true);
       setPlayerHeaderText('');
@@ -484,49 +591,15 @@ const Player = ({ route, navigation }) => {
         tabs={[
           {
             title: 'Profile',
-            content: (
-              <RenderContent
-                title={
-                  playerProfile && playerProfile.length > 0 && !quickLoading
-                    ? 'Player profile'
-                    : ''
-                }
-              >
-                <PlayerProfileTab
-                  averages={averages}
-                  playerProfile={playerProfile}
-                  isLoading={quickLoading}
-                  initialMount={initialMount}
-                />
-              </RenderContent>
-            ),
+            content: renderProfile('Player profile'),
           },
           {
             title: 'Averages',
-            content: (
-              <RenderContent
-                title={
-                  averages.length > 0 && !slowLoading ? 'Player averages' : ''
-                }
-              >
-                <PlayerAveragesTab
-                  colorMode={colorMode}
-                  allStats={stats}
-                  groupedStats={groupedStats}
-                  season={season}
-                  initialMount={initialMount}
-                  isPostSeason={isPostSeason}
-                  isLoading={slowLoading}
-                  subLoading={subLoading}
-                  teamData={teamData}
-                  totalGamesPlayed={gamesPlayed}
-                />
-              </RenderContent>
-            ),
+            content: renderAverages('Player averages'),
           },
           {
             title: 'Game Stats',
-            content: <Text>averages{initialMount.toString()}</Text>,
+            content: renderGameStats('Game stats'),
           },
         ]}
         background={renderBackground()}
@@ -548,20 +621,7 @@ const Player = ({ route, navigation }) => {
         }}
         tabsWrapperStyle={{ paddingVertical: 12 }}
       >
-        <RenderContent
-          title={
-            playerProfile && playerProfile.length > 0 && !quickLoading
-              ? 'Player profile'
-              : ''
-          }
-        >
-          <PlayerProfileTab
-            averages={averages}
-            playerProfile={playerProfile}
-            isLoading={quickLoading}
-            initialMount={initialMount}
-          />
-        </RenderContent>
+        {renderProfile('Player profile')}
       </StickyParallaxHeader>
     </>
   );

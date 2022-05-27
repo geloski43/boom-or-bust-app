@@ -3,7 +3,6 @@ import { NativeBaseProvider } from 'native-base';
 import theme from '../theme';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Provider as ModalProvider } from '../context/modal-context';
 import { Provider as LocalizationProvider } from '../context/localization-context';
 import { Provider as StatsProvider } from '../context/stats-context';
 import { Provider as PlayerProvider } from '../context/player-context';
@@ -33,16 +32,14 @@ const AppContainer = ({ children }) => {
       <GameProvider>
         <PlayerProvider>
           <StatsProvider>
-            <ModalProvider>
-              <LocalizationProvider>
-                <NativeBaseProvider
-                  colorModeManager={colorModeManager}
-                  theme={theme}
-                >
-                  {children}
-                </NativeBaseProvider>
-              </LocalizationProvider>
-            </ModalProvider>
+            <LocalizationProvider>
+              <NativeBaseProvider
+                colorModeManager={colorModeManager}
+                theme={theme}
+              >
+                {children}
+              </NativeBaseProvider>
+            </LocalizationProvider>
           </StatsProvider>
         </PlayerProvider>
       </GameProvider>

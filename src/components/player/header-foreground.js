@@ -1,15 +1,12 @@
-import React, { useContext } from 'react';
-import { View, Animated, StyleSheet, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { View, Animated, StyleSheet } from 'react-native';
 import { responsiveWidth } from '../../utils/utils';
-import { Ionicons } from '@expo/vector-icons';
-import { Icon, Text, Skeleton } from 'native-base';
-import { Context as ModalContext } from '../../context/modal-context';
+import { Text, Skeleton, useColorMode } from 'native-base';
 
 const HeaderForeground = ({
   scrollPosition,
   averages,
   scrollY,
-  colorMode,
   fullName,
   player,
   playerHeaderText,
@@ -17,8 +14,9 @@ const HeaderForeground = ({
   season,
   isPostSeason,
   isLoading,
+  renderSeasonOption,
 }) => {
-  const modalContext = useContext(ModalContext);
+  const { colorMode } = useColorMode();
 
   const lgTextSize = responsiveWidth(5);
   const smallTextSize = responsiveWidth(4);
@@ -281,23 +279,7 @@ const HeaderForeground = ({
                 w="105px"
               />
             )}
-            <TouchableOpacity
-              onPress={() => {
-                modalContext.openSeasonOptionModal();
-              }}
-            >
-              <Icon
-                ml={responsiveWidth(12)}
-                mt="-15px"
-                size="33px"
-                as={Ionicons}
-                name="options-outline"
-                color="darkBlue.500"
-                _dark={{
-                  color: 'warmGray.50',
-                }}
-              />
-            </TouchableOpacity>
+            {renderSeasonOption('30', '-12px')}
           </Animated.View>
         </>
       </Animated.View>

@@ -1,36 +1,65 @@
-import React, { useState, useContext } from 'react';
-import { Modal, Button, FormControl, VStack, Text, Switch } from 'native-base';
+import React, { useState } from 'react';
+import {
+  Button,
+  FormControl,
+  VStack,
+  Text,
+  Switch,
+  Popover,
+  Icon,
+} from 'native-base';
 import NumericInput from 'react-native-numeric-input';
-import { Context as ModalContext } from '../../context/modal-context';
+import { Ionicons } from '@expo/vector-icons';
 
-const SeasonOptionModal = ({
+const SeasonOption = ({
   setSeason,
   fetchStats,
   setIsPostSeason,
   player,
-  season,
-  isPostSeason,
+  num,
+  setNum,
+  truthy,
+  setTruthy,
+  size,
+  margin,
 }) => {
-  const modalContext = useContext(ModalContext);
-  const showSeasonOptionModal = modalContext.state.showSeasonOptionModal;
-
-  const [num, setNum] = useState(parseInt(season));
-  const [truthy, setTruthy] = useState(isPostSeason);
+  const [isOpen, setIsOpen] = useState(false);
 
   const toggleTruthy = () => setTruthy(!truthy);
 
   return (
-    <Modal
-      size="xs"
-      isOpen={showSeasonOptionModal}
-      onClose={() => modalContext.closeSeasonOptionModal()}
+    <Popover
+      placement="top right"
+      trigger={(triggerProps) => {
+        return (
+          <Button
+            mt={margin}
+            {...triggerProps}
+            _pressed={{ colorScheme: 'dark', borderRadius: 'full' }}
+            variant="ghost"
+            onPress={() => setIsOpen(true)}
+            _dark={{ colorScheme: 'blueGray' }}
+            m="1"
+            alignSelf="flex-start"
+            leftIcon={
+              <Icon
+                size={size}
+                as={Ionicons}
+                name="options-outline"
+                color="warning.800"
+              />
+            }
+          />
+        );
+      }}
+      isOpen={isOpen}
+      onClose={() => setIsOpen(!isOpen)}
     >
-      <Modal.Content maxWidth="400px">
-        <Modal.CloseButton />
-        <Modal.Header>
-          <Text fontFamily="Oswald-Medium">Season options</Text>
-        </Modal.Header>
-        <Modal.Body>
+      <Popover.Content w="56">
+        <Popover.Arrow />
+        <Popover.CloseButton onPress={() => setIsOpen(false)} />
+        <Popover.Header>Season options</Popover.Header>
+        <Popover.Body>
           <VStack space={4}>
             <FormControl>
               <FormControl.Label>
@@ -40,7 +69,7 @@ const SeasonOptionModal = ({
                 type="up-down"
                 value={num}
                 onChange={(value) => setNum(value)}
-                totalWidth={212}
+                totalWidth={200}
                 totalHeight={50}
                 step={1}
                 valueType="real"
@@ -68,14 +97,14 @@ const SeasonOptionModal = ({
               />
             </FormControl>
           </VStack>
-        </Modal.Body>
-        <Modal.Footer>
+        </Popover.Body>
+        <Popover.Footer justifyContent="flex-end">
           <Button.Group space={2}>
             <Button
               variant="ghost"
               colorScheme="blueGray"
               onPress={() => {
-                modalContext.closeSeasonOptionModal();
+                setIsOpen(false);
               }}
             >
               Cancel
@@ -85,17 +114,17 @@ const SeasonOptionModal = ({
               onPress={() => {
                 setSeason(num);
                 setIsPostSeason(truthy);
-                fetchStats(num, player.id, truthy);
-                modalContext.closeSeasonOptionModal();
+                fetchStats(num, player && player.id, truthy);
+                setIsOpen(false);
               }}
             >
               Get stats
             </Button>
           </Button.Group>
-        </Modal.Footer>
-      </Modal.Content>
-    </Modal>
+        </Popover.Footer>
+      </Popover.Content>
+    </Popover>
   );
 };
 
-export default SeasonOptionModal;
+export default SeasonOption;

@@ -155,7 +155,7 @@ const PlayerAveragesTab = ({
   };
 
   // this is the final data we will use to display in the table
-  // if index changes table values will update
+  // if index, allStats and groupedState changes table values will update
   const dataArray = useMemo(() => {
     if (selectedData().length === 0) {
       return [];
@@ -169,7 +169,7 @@ const PlayerAveragesTab = ({
         },
       ];
     }
-  }, [index]);
+  }, [index, allStats, groupedStats]);
 
   const padding = dataArray.length > 0 ? '0%' : '25%';
 

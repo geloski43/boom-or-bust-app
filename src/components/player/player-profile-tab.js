@@ -3,7 +3,6 @@ import {
   Text,
   VStack,
   Stack,
-  ScrollView,
   Container,
   Link,
   Center,
@@ -22,7 +21,7 @@ const PlayerProfileTab = ({
   return (
     <>
       {!isLoading ? (
-        <ScrollView>
+        <>
           {playerProfile && playerProfile.length > 0 ? (
             <VStack flex={1} space={3}>
               {playerProfile.map((v, i) => (
@@ -102,7 +101,7 @@ const PlayerProfileTab = ({
               )}
             </>
           )}
-        </ScrollView>
+        </>
       ) : (
         <Center py={padding}>
           <HStack space={2} justifyContent="center">
