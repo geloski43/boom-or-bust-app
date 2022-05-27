@@ -339,26 +339,6 @@ const Player = ({ route, navigation }) => {
     return position(headerLayout.height, value);
   };
 
-  // background of parallax header
-  const renderBackground = () => {
-    const headerBorderRadius = scrollY.y.interpolate({
-      inputRange: [0, height],
-      outputRange: [80, 0],
-      extrapolate: 'extend',
-    });
-
-    return (
-      <Animated.View
-        style={[
-          Platform.OS === 'android' ? styles.background : styles.backgroundIos,
-          {
-            borderBottomRightRadius: headerBorderRadius,
-            backgroundColor: colorMode === 'dark' ? '#002851' : '#e0f2fe',
-          },
-        ]}
-      />
-    );
-  };
   const onLayoutContent = (e, title) => {
     const contentHeightTmp = { ...contentHeight };
     contentHeightTmp[title] = e.nativeEvent.layout.height;
@@ -385,6 +365,28 @@ const Player = ({ route, navigation }) => {
       return marginBottom > 0 ? marginBottom : 0;
     }
     return marginBottom;
+  };
+
+
+  // background of parallax header
+  const renderBackground = () => {
+    const headerBorderRadius = scrollY.y.interpolate({
+      inputRange: [0, height],
+      outputRange: [80, 0],
+      extrapolate: 'extend',
+    });
+
+    return (
+      <Animated.View
+        style={[
+          Platform.OS === 'android' ? styles.background : styles.backgroundIos,
+          {
+            borderBottomRightRadius: headerBorderRadius,
+            backgroundColor: colorMode === 'dark' ? '#002851' : '#e0f2fe',
+          },
+        ]}
+      />
+    );
   };
 
   const renderSeasonOption = (size, margin, placement) => {
@@ -511,18 +513,21 @@ const Player = ({ route, navigation }) => {
 
   // parallax top header
   const renderHeader = () => (
-    <Header
-      renderSeasonOption={renderSeasonOption}
-      player={player}
-      fullName={fullName}
-      scrollY={scrollY}
-      colorMode={colorMode}
-      scrollPosition={scrollPosition}
-    />
+    <>
+      {!slowLoading && !initialMount ? (
+        <Header
+          renderSeasonOption={renderSeasonOption}
+          player={player}
+          fullName={fullName}
+          scrollY={scrollY}
+          colorMode={colorMode}
+          scrollPosition={scrollPosition}
+        />
+      ) : (
+        null
+      )}
+    </>
   );
-
-
-
 
   // parallax header foreground
   const renderForeground = () => (

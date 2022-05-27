@@ -187,7 +187,7 @@ export const PlayersPlaceholder = () => {
         />
       </HStack>
       <Box alignItems="center">
-        {Array.from(Array(3).keys()).map((v, i) => (
+        {Array.from(Array(4).keys()).map((v, i) => (
           <Flex m="1" mx="2" h={170} key={i} direction="row">
             <Center
               m="1"

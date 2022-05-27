@@ -30,20 +30,22 @@ const colorModeManager = {
 const AppContainer = ({ children }) => {
   return (
     <NavigationContainer>
-      <GameProvider>
-        <PlayerProvider>
-          <StatsProvider>
-            <LocalizationProvider>
-              <NativeBaseProvider
-                colorModeManager={colorModeManager}
-                theme={theme}
-              >
-                {children}
-              </NativeBaseProvider>
-            </LocalizationProvider>
-          </StatsProvider>
-        </PlayerProvider>
-      </GameProvider>
+      <SSRProvider>
+        <GameProvider>
+          <PlayerProvider>
+            <StatsProvider>
+              <LocalizationProvider>
+                <NativeBaseProvider
+                  colorModeManager={colorModeManager}
+                  theme={theme}
+                >
+                  {children}
+                </NativeBaseProvider>
+              </LocalizationProvider>
+            </StatsProvider>
+          </PlayerProvider>
+        </GameProvider>
+      </SSRProvider>
     </NavigationContainer>
   );
 };
