@@ -6,7 +6,7 @@ import {
   FormControl,
   WarningOutlineIcon,
 } from 'native-base';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Context as PlayerContext } from '../../context/player-context';
 import PageProgress from '../../components/page-progress';
@@ -53,6 +53,8 @@ const PlayerSearchbar = ({
             setPage(1);
             searchPlayerByName(query);
           }}
+          // only in ios
+          h={playerSearchError ? Platform.OS === "ios" ? '45px' : '' : "40px"}
           ref={inputRef}
           // this will prevent auto scroll top when the input is focused
           // instead move to index save to playerlistscrollposition state

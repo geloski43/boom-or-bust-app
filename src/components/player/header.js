@@ -100,36 +100,7 @@ const Header = ({
           opacity: nameOpacity,
         }}
       >
-<<<<<<< HEAD
-<Button
-  _pressed={{ colorScheme: 'dark', borderRadius: 'full' }}
-  variant="ghost"
-  onPress={() => {
-    setTimeout(() => {
-      modalContext.openSeasonOptionModal();
-    }, 900)
-  }}
-  _dark={{ colorScheme: 'blueGray' }}
-  m="1"
-  leftIcon={
-    <Icon
-      mt="5"
-      mr={width * 0.05}
-      size="23px"
-      as={Ionicons}
-      name="options-outline"
-      color="darkBlue.500"
-      _dark={{
-        color: 'warmGray.50',
-      }}
-    />
-  }
-/>
-
-
-=======
         {renderSeasonOption('25', '22px', 'right top')}
->>>>>>> 4dfdd50573e07f658303ad63cfbd1064cbead92f
       </Animated.View >
     </View >
   );

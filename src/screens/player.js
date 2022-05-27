@@ -359,25 +359,15 @@ const Player = ({ route, navigation }) => {
       />
     );
   };
-<<<<<<< HEAD
-
-=======
->>>>>>> 4dfdd50573e07f658303ad63cfbd1064cbead92f
   const onLayoutContent = (e, title) => {
     const contentHeightTmp = { ...contentHeight };
     contentHeightTmp[title] = e.nativeEvent.layout.height;
 
     setContentHeight({
-<<<<<<< HEAD
-      ...contentHeightTmp
-    });
-  };
-=======
       ...contentHeightTmp,
     });
   };
 
->>>>>>> 4dfdd50573e07f658303ad63cfbd1064cbead92f
   // for ios marginBottom
   const calcMargin = (title) => {
     let marginBottom = 50;
@@ -397,9 +387,6 @@ const Player = ({ route, navigation }) => {
     return marginBottom;
   };
 
-<<<<<<< HEAD
-  // wrapper for rendered component tab
-=======
   const renderSeasonOption = (size, margin, placement) => {
     return (
       <SeasonOption
@@ -417,7 +404,6 @@ const Player = ({ route, navigation }) => {
       />
     );
   };
->>>>>>> 4dfdd50573e07f658303ad63cfbd1064cbead92f
 
   const renderProfile = (title) => {
     const marginBottom = Platform.select({
@@ -426,11 +412,7 @@ const Player = ({ route, navigation }) => {
     });
 
     return (
-<<<<<<< HEAD
-      <View
-=======
       <Box
->>>>>>> 4dfdd50573e07f658303ad63cfbd1064cbead92f
         onLayout={(e) => onLayoutContent(e, title)}
         style={[
           Platform.OS === 'android'
@@ -454,26 +436,10 @@ const Player = ({ route, navigation }) => {
           isLoading={quickLoading}
           initialMount={initialMount}
         />
-<<<<<<< HEAD
-        <SeasonOptionModal
-          setSeason={setSeason}
-          fetchStats={fetchStats}
-          setIsPostSeason={setIsPostSeason}
-          player={player}
-          season={season}
-          isPostSeason={isPostSeason}
-        />
-      </View>
-    );
-  };
-
-
-=======
       </Box>
     );
   };
 
->>>>>>> 4dfdd50573e07f658303ad63cfbd1064cbead92f
   const renderAverages = (title) => {
     const marginBottom = Platform.select({
       ios: calcMargin(title),
@@ -481,11 +447,7 @@ const Player = ({ route, navigation }) => {
     });
 
     return (
-<<<<<<< HEAD
-      <View
-=======
       <Box
->>>>>>> 4dfdd50573e07f658303ad63cfbd1064cbead92f
         onLayout={(e) => onLayoutContent(e, title)}
         style={[
           Platform.OS === 'android'
@@ -506,7 +468,6 @@ const Player = ({ route, navigation }) => {
           colorMode={colorMode}
           allStats={stats}
           groupedStats={groupedStats}
-<<<<<<< HEAD
           season={season}
           initialMount={initialMount}
           isPostSeason={isPostSeason}
@@ -515,29 +476,10 @@ const Player = ({ route, navigation }) => {
           teamData={teamData}
           totalGamesPlayed={gamesPlayed}
         />
-        <SeasonOptionModal
-          setSeason={setSeason}
-          fetchStats={fetchStats}
-          setIsPostSeason={setIsPostSeason}
-          player={player}
-=======
->>>>>>> 4dfdd50573e07f658303ad63cfbd1064cbead92f
-          season={season}
-          initialMount={initialMount}
-          isPostSeason={isPostSeason}
-          isLoading={slowLoading}
-          subLoading={subLoading}
-          teamData={teamData}
-          totalGamesPlayed={gamesPlayed}
-        />
-      </View>
+      </Box>
     );
   };
 
-<<<<<<< HEAD
-
-
-=======
   const renderGameStats = (title) => {
     const marginBottom = Platform.select({
       ios: calcMargin(title),
@@ -566,7 +508,6 @@ const Player = ({ route, navigation }) => {
       </Box>
     );
   };
->>>>>>> 4dfdd50573e07f658303ad63cfbd1064cbead92f
 
   // parallax top header
   const renderHeader = () => (
@@ -647,48 +588,6 @@ const Player = ({ route, navigation }) => {
   }, [navigation]);
 
   return (
-<<<<<<< HEAD
-
-    <StickyParallaxHeader
-      foreground={renderForeground()}
-      header={renderHeader()}
-      tabs={[
-        {
-          title: 'Profile',
-          content: renderProfile("Player profile")
-        },
-        {
-          title: 'Averages',
-          content: renderAverages("Player averages")
-        },
-        // {
-        //   title: 'Game Stats',
-        //   content: renderGameStats()
-        // },
-      ]}
-      background={renderBackground()}
-      deviceWidth={width}
-      parallaxHeight={responsiveHeight(50)}
-      scrollEvent={event(
-        [{ nativeEvent: { contentOffset: { y: scrollY.y } } }],
-        { useNativeDriver: false }
-      )}
-      headerSize={setHeaderSize}
-      headerHeight={responsiveHeight(13)}
-      tabTextStyle={[styles.tabText, { fontSize: lgTextSize }]}
-      tabTextContainerStyle={{
-        backgroundColor: 'transparent',
-        borderRadius: 18,
-      }}
-      tabTextContainerActiveStyle={{
-        backgroundColor: colorMode === 'dark' ? '#374151' : '#e5e7eb',
-      }}
-      tabsWrapperStyle={{ paddingVertical: 12 }}
-    >
-      {renderProfile("Player profile")}
-    </StickyParallaxHeader>
-
-=======
     <>
       <StickyParallaxHeader
         foreground={renderForeground()}
@@ -729,7 +628,6 @@ const Player = ({ route, navigation }) => {
         {renderProfile('Player profile')}
       </StickyParallaxHeader>
     </>
->>>>>>> 4dfdd50573e07f658303ad63cfbd1064cbead92f
   );
 };
 
