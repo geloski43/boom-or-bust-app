@@ -59,11 +59,11 @@ const Header = ({
           source={
             imageStatus !== 'Loaded'
               ? {
-                  uri: 'https://via.placeholder.com/32/BBC2CC/BBC2CC?text=.....',
-                }
+                uri: 'https://via.placeholder.com/32/BBC2CC/BBC2CC?text=.....',
+              }
               : {
-                  uri: player && player.playerImage,
-                }
+                uri: player && player.playerImage,
+              }
           }
           style={[
             styles.headerPic,
@@ -101,8 +101,8 @@ const Header = ({
         }}
       >
         {renderSeasonOption('25', '22px', 'right top')}
-      </Animated.View>
-    </View>
+      </Animated.View >
+    </View >
   );
 };
 

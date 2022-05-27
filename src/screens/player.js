@@ -123,7 +123,7 @@ const Player = ({ route, navigation }) => {
           convertedMins:
             obj.min && obj.min.includes(':')
               ? parseInt(obj.min.slice(0, 2)) +
-                  parseInt(obj.min.slice(-2)) / 60 || 0
+              parseInt(obj.min.slice(-2)) / 60 || 0
               : parseInt(obj.min) || 0,
         }));
         // we add teamlogo and teamid props,
@@ -294,12 +294,12 @@ const Player = ({ route, navigation }) => {
           // test if value has a number in it
           header =
             /\d/.test(listedHeight.value.slice(0, 1)) &&
-            /\d/.test(listedHeight.value.slice(5, -3)) &&
-            /\d/.test(listedWeight.value)
+              /\d/.test(listedHeight.value.slice(5, -3)) &&
+              /\d/.test(listedWeight.value)
               ? `${listedHeight.value.slice(0, 1)}'${listedHeight.value.slice(
-                  5,
-                  -3
-                )}",${listedWeight.value}s`
+                5,
+                -3
+              )}",${listedWeight.value}s`
               : biometrics;
           year = /\d/.test(parseInt(yearDrafted.value.slice(0, 4)))
             ? parseInt(yearDrafted.value.slice(0, 4))
@@ -339,26 +339,6 @@ const Player = ({ route, navigation }) => {
     return position(headerLayout.height, value);
   };
 
-  // background of parallax header
-  const renderBackground = () => {
-    const headerBorderRadius = scrollY.y.interpolate({
-      inputRange: [0, height],
-      outputRange: [80, 0],
-      extrapolate: 'extend',
-    });
-
-    return (
-      <Animated.View
-        style={[
-          Platform.OS === 'android' ? styles.background : styles.backgroundIos,
-          {
-            borderBottomRightRadius: headerBorderRadius,
-            backgroundColor: colorMode === 'dark' ? '#002851' : '#e0f2fe',
-          },
-        ]}
-      />
-    );
-  };
   const onLayoutContent = (e, title) => {
     const contentHeightTmp = { ...contentHeight };
     contentHeightTmp[title] = e.nativeEvent.layout.height;
@@ -385,6 +365,28 @@ const Player = ({ route, navigation }) => {
       return marginBottom > 0 ? marginBottom : 0;
     }
     return marginBottom;
+  };
+
+
+  // background of parallax header
+  const renderBackground = () => {
+    const headerBorderRadius = scrollY.y.interpolate({
+      inputRange: [0, height],
+      outputRange: [80, 0],
+      extrapolate: 'extend',
+    });
+
+    return (
+      <Animated.View
+        style={[
+          Platform.OS === 'android' ? styles.background : styles.backgroundIos,
+          {
+            borderBottomRightRadius: headerBorderRadius,
+            backgroundColor: colorMode === 'dark' ? '#002851' : '#e0f2fe',
+          },
+        ]}
+      />
+    );
   };
 
   const renderSeasonOption = (size, margin, placement) => {
@@ -511,14 +513,20 @@ const Player = ({ route, navigation }) => {
 
   // parallax top header
   const renderHeader = () => (
-    <Header
-      renderSeasonOption={renderSeasonOption}
-      player={player}
-      fullName={fullName}
-      scrollY={scrollY}
-      colorMode={colorMode}
-      scrollPosition={scrollPosition}
-    />
+    <>
+      {!slowLoading && !initialMount ? (
+        <Header
+          renderSeasonOption={renderSeasonOption}
+          player={player}
+          fullName={fullName}
+          scrollY={scrollY}
+          colorMode={colorMode}
+          scrollPosition={scrollPosition}
+        />
+      ) : (
+        null
+      )}
+    </>
   );
 
   // parallax header foreground

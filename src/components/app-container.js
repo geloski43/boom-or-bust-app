@@ -7,6 +7,7 @@ import { Provider as LocalizationProvider } from '../context/localization-contex
 import { Provider as StatsProvider } from '../context/stats-context';
 import { Provider as PlayerProvider } from '../context/player-context';
 import { Provider as GameProvider } from '../context/game-context';
+import { SSRProvider } from '@react-aria/ssr';
 
 const colorModeManager = {
   get: async () => {
@@ -29,20 +30,22 @@ const colorModeManager = {
 const AppContainer = ({ children }) => {
   return (
     <NavigationContainer>
-      <GameProvider>
-        <PlayerProvider>
-          <StatsProvider>
-            <LocalizationProvider>
-              <NativeBaseProvider
-                colorModeManager={colorModeManager}
-                theme={theme}
-              >
-                {children}
-              </NativeBaseProvider>
-            </LocalizationProvider>
-          </StatsProvider>
-        </PlayerProvider>
-      </GameProvider>
+      <SSRProvider>
+        <GameProvider>
+          <PlayerProvider>
+            <StatsProvider>
+              <LocalizationProvider>
+                <NativeBaseProvider
+                  colorModeManager={colorModeManager}
+                  theme={theme}
+                >
+                  {children}
+                </NativeBaseProvider>
+              </LocalizationProvider>
+            </StatsProvider>
+          </PlayerProvider>
+        </GameProvider>
+      </SSRProvider>
     </NavigationContainer>
   );
 };
