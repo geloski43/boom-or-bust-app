@@ -1,4 +1,4 @@
-export const playerImageData = [
+export const localPlayerData = [
   {
     id: 3,
     full_name: 'Steven Adams',

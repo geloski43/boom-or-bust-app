@@ -1,9 +1,25 @@
-import React from 'react';
-import { Text, Stack, ZStack, IconButton } from 'native-base';
+import React, { useContext } from 'react';
+import {
+  Text,
+  Stack,
+  ZStack,
+  IconButton,
+  PresenceTransition,
+} from 'native-base';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { AntDesign } from '@expo/vector-icons';
+import { Context as PlayerContext } from '../context/player-context';
+import { Context as GameContext } from '../context/game-context';
 
 const PageProgress = ({ progress, moveToTop }) => {
+  const gameContext = useContext(GameContext);
+  const playerContext = useContext(PlayerContext);
+  const { playerlistScrollPosition } = playerContext.state;
+  const { gamelistScrollPosition } = gameContext.state;
+
+  const visibleArrowUp =
+    playerlistScrollPosition >= 3 || gamelistScrollPosition >= 5;
+
   return (
     <Stack
       my="1"
@@ -14,16 +30,32 @@ const PageProgress = ({ progress, moveToTop }) => {
       direction="row"
       alignSelf="flex-end"
     >
-      <IconButton
+      <PresenceTransition
         alignSelf="center"
-        onPress={moveToTop}
-        _icon={{
-          as: AntDesign,
-          name: 'arrowup',
-          size: 'xs',
-          color: 'lightBlue.800',
+        visible={visibleArrowUp}
+        initial={{
+          opacity: 0,
+          scale: 0,
         }}
-      />
+        animate={{
+          opacity: 1,
+          scale: 1,
+          transition: {
+            type: 'spring',
+            duration: 250,
+          },
+        }}
+      >
+        <IconButton
+          onPress={moveToTop}
+          _icon={{
+            as: AntDesign,
+            name: 'arrowup',
+            size: 'xs',
+            color: 'lightBlue.800',
+          }}
+        />
+      </PresenceTransition>
       <ZStack mx="3" justifyContent="center" mb="-1" pt="1">
         <Text
           alignSelf="center"

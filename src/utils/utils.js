@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { playerImageData } from '../constants/player-image-data';
+import { localPlayerData } from '../constants/local-player-data';
 import { Dimensions, Platform } from 'react-native';
+import { localTeamData } from '../constants/local-team-data';
 
 export const { height, width } = Dimensions.get('window');
 export const responsiveHeight = (h) => height * (h / 100);
@@ -29,14 +30,14 @@ export const dayToShow = (date, timezone) => {
   return day === today && month === currentMonth && selectedLocales
     ? `Today`
     : ((day === today + 1 && month === currentMonth) ||
-      month === currentMonth + 1) &&
+        month === currentMonth + 1) &&
       selectedLocales
-      ? `Tomorrow`
-      : ((day === today - 1 && month === currentMonth) ||
+    ? `Tomorrow`
+    : ((day === today - 1 && month === currentMonth) ||
         month === currentMonth - 1) &&
-        selectedLocales
-        ? `Yesterday`
-        : days[parseDate(date).getDay()];
+      selectedLocales
+    ? `Yesterday`
+    : days[parseDate(date).getDay()];
 };
 
 export const teamLogo = (id, team) => {
@@ -48,6 +49,8 @@ export const teamLogo = (id, team) => {
       .toLowerCase()}_secondary.png`;
   }
 };
+
+export const matchedTeam = (id) => localTeamData.find((logo) => logo.id === id);
 
 export const genericPlayerImage = (string) => {
   if (string === 'LA Clippers') {
@@ -63,7 +66,7 @@ export const genericPlayerImage = (string) => {
 };
 
 export const findPlayerImage = (id) => {
-  const player = playerImageData.find((p) => p.id === id);
+  const player = localPlayerData.find((p) => p.id === id);
   return player ? player.image : null;
 };
 

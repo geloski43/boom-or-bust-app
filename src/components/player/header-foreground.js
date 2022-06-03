@@ -255,7 +255,7 @@ const HeaderForeground = ({
               display: 'flex',
               flexDirection: 'row',
               justifyContent:
-                gamesPlayed !== 0 ? 'space-around' : 'space-between',
+                averages.length !== 0 ? 'space-around' : 'space-between',
             }}
           >
             {!isLoading ? (

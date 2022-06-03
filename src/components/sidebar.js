@@ -55,6 +55,10 @@ const Sidebar = (props) => {
   const handlePressPlayers = useCallback(() => {
     navigation.navigate('Players');
   }, [navigation]);
+
+  const handlePressHeadToHead = useCallback(() => {
+    navigation.navigate('Head to Head');
+  }, [navigation]);
   return (
     <Box
       safeArea
@@ -110,6 +114,12 @@ const Sidebar = (props) => {
           onPress={handlePressPlayers}
         >
           Players
+        </MenuButton>
+        <MenuButton
+          active={currentRoute === 'Head to Head'}
+          onPress={handlePressHeadToHead}
+        >
+          Head to Head
         </MenuButton>
       </VStack>
       <Center>

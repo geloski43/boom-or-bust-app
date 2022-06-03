@@ -18,9 +18,10 @@ import {
   responsiveHeight,
   responsiveWidth,
   ifIphoneX,
-  teamLogo,
   groupBy,
+  matchedTeam,
 } from '../utils/utils';
+import PlayerGameStatsTab from '../components/player/player-game-stats-tab';
 
 const { event, ValueXY } = Animated;
 const Player = ({ route, navigation }) => {
@@ -48,6 +49,13 @@ const Player = ({ route, navigation }) => {
   const [gamesPlayed, setGamesPlayed] = useState(0);
   const [playerHeaderText, setPlayerHeaderText] = useState(biometrics);
   const [teamData, setTeamData] = useState([]);
+
+  //game stats tab states
+  const [statsTabPage, setStatsTabPage] = useState(1);
+  const [statsByTeamIndex, setStatsByTeamIndex] = useState(null);
+
+  // averages tab state
+  const [averagesByTeamIndex, setAveragesByTeamIndex] = useState(null);
 
   // we need this to show season data inside the option pop up
   const [num, setNum] = useState(parseInt(new Date().getFullYear()));
@@ -78,6 +86,10 @@ const Player = ({ route, navigation }) => {
   };
 
   const fetchStats = (year, id, postSeason) => {
+    setStatsTabPage(1);
+    setStatsByTeamIndex(null);
+    setAveragesByTeamIndex(null);
+    console.log('fetching stats');
     let resData = [];
     let gameStats = [];
     let totalGamesCount = 0;
@@ -98,7 +110,11 @@ const Player = ({ route, navigation }) => {
         resData = res.data.data;
         // get invalid games to be substracted from total games
         voidGames = res.data.data.filter(
-          (game) => game.min === null || game.min === '0:00' || game.min === ''
+          (game) =>
+            game.min === null ||
+            game.min === '0:00' ||
+            game.min === '' ||
+            game.min === '0'
         );
         totalGamesCount = res.data.meta.total_count - voidGames.length;
         // if no data reset some states and return early
@@ -123,22 +139,36 @@ const Player = ({ route, navigation }) => {
           convertedMins:
             obj.min && obj.min.includes(':')
               ? parseInt(obj.min.slice(0, 2)) +
-              parseInt(obj.min.slice(-2)) / 60 || 0
+                  parseInt(obj.min.slice(-2)) / 60 || 0
               : parseInt(obj.min) || 0,
         }));
-        // we add teamlogo and teamid props,
+        // we add team details(logo, home city etc.) in each item
         // teamid which we will use to group games by same team if a player has multiple teams in a season
-        gameStats = resData.map((obj) => ({
-          ...obj,
-          teamLogo: teamLogo(obj.team.id, obj.team.full_name),
-          teamId: obj.team.id,
-        }));
+        // and filter out void games data from the api
+        gameStats = resData
+          .filter(
+            (item) =>
+              item.min !== null &&
+              item.min !== '0:00' &&
+              item.min !== '' &&
+              item.min !== '0'
+          )
+          .map((obj) => ({
+            ...obj,
+            teamId: obj.team.id,
+            visitor_team_logo: matchedTeam(obj.game.visitor_team_id).logo,
+            visitor_team_name: matchedTeam(obj.game.visitor_team_id).name,
+            home_team_logo: matchedTeam(obj.game.home_team_id).logo,
+            home_team_name: matchedTeam(obj.game.home_team_id).name,
+            homeTeamCity: matchedTeam(obj.game.home_team_id).city,
+          }));
+
         // we will usee this to add team details in the accumulated totals object
         currentTeam = resData.map((obj) => ({
           teamId: obj.team.id,
           teamAbbr: obj.team.abbreviation,
           teamFullName: obj.team.full_name,
-          teamLogo: teamLogo(obj.team.id, obj.team.full_name),
+          teamLogo: matchedTeam(obj.team.id).logo,
         }));
         teams =
           currentTeam &&
@@ -212,10 +242,11 @@ const Player = ({ route, navigation }) => {
               ...team,
               totalGamesPlayed: gameStats.filter(
                 (game) =>
-                  game.team.id === team.teamId ||
-                  game.min !== null ||
-                  game.min !== '0:00' ||
-                  game.min !== ''
+                  game.team.id === team.teamId &&
+                  game.min !== null &&
+                  game.min !== '0:00' &&
+                  game.min !== '' &&
+                  game.min !== '0'
               ).length,
             };
           }),
@@ -232,7 +263,8 @@ const Player = ({ route, navigation }) => {
                   game.team.id === team.teamId &&
                   game.min !== null &&
                   game.min !== '0:00' &&
-                  game.min !== ''
+                  game.min !== '' &&
+                  game.min !== '0'
               ).length,
             };
           })
@@ -248,7 +280,7 @@ const Player = ({ route, navigation }) => {
         ]);
         // we use this to group stats by team so we can easily select data for a single team
         setGroupedStats(groupBy(gameStats, 'teamId'));
-        console.log('has data', groupBy(gameStats, 'teamId'));
+        console.log('has data first index', totalGamesCount);
         // we use this to display total stats if there are multiple teams
         setStats(gameStats);
         if (initialMount) {
@@ -294,12 +326,12 @@ const Player = ({ route, navigation }) => {
           // test if value has a number in it
           header =
             /\d/.test(listedHeight.value.slice(0, 1)) &&
-              /\d/.test(listedHeight.value.slice(5, -3)) &&
-              /\d/.test(listedWeight.value)
+            /\d/.test(listedHeight.value.slice(5, -3)) &&
+            /\d/.test(listedWeight.value)
               ? `${listedHeight.value.slice(0, 1)}'${listedHeight.value.slice(
-                5,
-                -3
-              )}",${listedWeight.value}s`
+                  5,
+                  -3
+                )}",${listedWeight.value}s`
               : biometrics;
           year = /\d/.test(parseInt(yearDrafted.value.slice(0, 4)))
             ? parseInt(yearDrafted.value.slice(0, 4))
@@ -323,7 +355,7 @@ const Player = ({ route, navigation }) => {
       });
   };
 
-  // header parallax functions and variables
+  // header parallax functions and variables and components
 
   const textColor = colorMode === 'dark' ? 'white' : 'black';
   const lgTextSize = responsiveWidth(4);
@@ -365,28 +397,6 @@ const Player = ({ route, navigation }) => {
       return marginBottom > 0 ? marginBottom : 0;
     }
     return marginBottom;
-  };
-
-
-  // background of parallax header
-  const renderBackground = () => {
-    const headerBorderRadius = scrollY.y.interpolate({
-      inputRange: [0, height],
-      outputRange: [80, 0],
-      extrapolate: 'extend',
-    });
-
-    return (
-      <Animated.View
-        style={[
-          Platform.OS === 'android' ? styles.background : styles.backgroundIos,
-          {
-            borderBottomRightRadius: headerBorderRadius,
-            backgroundColor: colorMode === 'dark' ? '#002851' : '#e0f2fe',
-          },
-        ]}
-      />
-    );
   };
 
   const renderSeasonOption = (size, margin, placement) => {
@@ -433,7 +443,6 @@ const Player = ({ route, navigation }) => {
         )}
 
         <PlayerProfileTab
-          averages={averages}
           playerProfile={playerProfile}
           isLoading={quickLoading}
           initialMount={initialMount}
@@ -448,6 +457,8 @@ const Player = ({ route, navigation }) => {
       android: 0,
     });
 
+    const showTitle = stats.length > 0 && groupedStats.length > 0;
+
     return (
       <Box
         onLayout={(e) => onLayoutContent(e, title)}
@@ -461,22 +472,23 @@ const Player = ({ route, navigation }) => {
           },
         ]}
       >
-        {gamesPlayed !== 0 && (
+        {showTitle && (
           <Text style={[styles.contentTitle, { color: textColor }]}>
             {title}
           </Text>
         )}
         <PlayerAveragesTab
-          colorMode={colorMode}
-          allStats={stats}
+          stats={stats}
           groupedStats={groupedStats}
           season={season}
+          isLoading={subLoading}
           initialMount={initialMount}
           isPostSeason={isPostSeason}
-          isLoading={slowLoading}
           subLoading={subLoading}
           teamData={teamData}
           totalGamesPlayed={gamesPlayed}
+          averagesByTeamIndex={averagesByTeamIndex}
+          setAveragesByTeamIndex={setAveragesByTeamIndex}
         />
       </Box>
     );
@@ -501,13 +513,48 @@ const Player = ({ route, navigation }) => {
           },
         ]}
       >
-        {gamesPlayed !== 0 && (
+        {stats.length !== 0 && !slowLoading && !subLoading && !initialMount && (
           <Text style={[styles.contentTitle, { color: textColor }]}>
             {title}
           </Text>
         )}
-        <Text>{JSON.stringify(stats)}</Text>
+        <PlayerGameStatsTab
+          initialMount={initialMount}
+          isLoading={slowLoading}
+          season={season}
+          isPostSeason={isPostSeason}
+          teamData={teamData}
+          subLoading={subLoading}
+          totalGamesPlayed={gamesPlayed}
+          stats={stats}
+          groupedStats={groupedStats}
+          statsTabPage={statsTabPage}
+          setStatsTabPage={setStatsTabPage}
+          statsByTeamIndex={statsByTeamIndex}
+          setStatsByTeamIndex={setStatsByTeamIndex}
+        />
       </Box>
+    );
+  };
+
+  // background of parallax header
+  const renderBackground = () => {
+    const headerBorderRadius = scrollY.y.interpolate({
+      inputRange: [0, height],
+      outputRange: [80, 0],
+      extrapolate: 'extend',
+    });
+
+    return (
+      <Animated.View
+        style={[
+          Platform.OS === 'android' ? styles.background : styles.backgroundIos,
+          {
+            borderBottomRightRadius: headerBorderRadius,
+            backgroundColor: colorMode === 'dark' ? '#002851' : '#e0f2fe',
+          },
+        ]}
+      />
     );
   };
 
@@ -523,9 +570,7 @@ const Player = ({ route, navigation }) => {
           colorMode={colorMode}
           scrollPosition={scrollPosition}
         />
-      ) : (
-        null
-      )}
+      ) : null}
     </>
   );
 
@@ -586,6 +631,9 @@ const Player = ({ route, navigation }) => {
       setGamesPlayed(0);
       setInitialMount(true);
       setPlayerHeaderText('');
+      setAveragesByTeamIndex(null);
+      setStatsTabPage(1);
+      setStatsByTeamIndex(null);
       scrollY.y.removeListener();
       navigation.setParams({ itemId: null, fullName: null, biometrics: null });
     });

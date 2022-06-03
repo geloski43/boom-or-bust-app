@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useRef } from 'react';
 import {
   Skeleton,
   HStack,
@@ -14,8 +14,9 @@ import {
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import BigList from 'react-native-big-list';
 import { parseDate } from '../../utils/utils';
-import { Context as LocalizationContext } from '../../context/localization-context';
+import { Context as GameContext } from '../../context/game-context';
 import { EvilIcons } from '@expo/vector-icons';
+import * as Localization from 'expo-localization';
 
 const GameList = ({
   data,
@@ -32,8 +33,18 @@ const GameList = ({
   gamelistRef,
   navigation,
 }) => {
-  const localeContext = useContext(LocalizationContext);
-  const timeZone = localeContext.state.timezoneName;
+  const timeZone = Localization.timezone;
+
+  const gameContext = useContext(GameContext);
+  const [onViewItems, setOnViewItems] = useState([]);
+
+  const onViewRef = useRef((viewableItems) => {
+    gameContext.setGamelistScrollPosition(
+      viewableItems.viewableItems[0] && viewableItems.viewableItems[0].index
+    );
+    setOnViewItems(viewableItems);
+  });
+  const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold: 50 });
 
   const opacity = (firstScore, secondScore) => {
     if (firstScore === secondScore) {
@@ -312,6 +323,8 @@ const GameList = ({
         data={data}
         renderItem={renderItem}
         itemHeight={105}
+        onViewableItemsChanged={onViewRef.current}
+        viewabilityConfig={viewConfigRef.current}
         keyExtractor={(item) => item.id.toString()}
       />
     </>

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { getTeams } from '../api/ball-dont-lie-api';
 import ScreenContainer from '../components/screen-container';
 import bballCourt from '../assets/images/bball-court.jpg';
-import { teamsLogo } from '../constants/teams-logo';
+import { localTeamData } from '../constants/local-team-data';
 import { TeamsPlaceholder } from '../components/placeholders';
 import TeamList from '../components/teams/team-list';
 
@@ -23,7 +23,7 @@ const Teams = ({ navigation }) => {
       .then((teams) => {
         arr = teams.data.data.map((obj, index) => ({
           ...obj,
-          logo: teamsLogo[index].logo,
+          logo: localTeamData[index].logo,
         }));
         setTeams(arr);
         setIsLoading(false);

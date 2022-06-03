@@ -11,13 +11,7 @@ import {
   HStack,
 } from 'native-base';
 
-const PlayerProfileTab = ({
-  playerProfile,
-  isLoading,
-  initialMount,
-  averages,
-}) => {
-  const padding = averages.length > 0 ? '0%' : '25%';
+const PlayerProfileTab = ({ playerProfile, isLoading, initialMount }) => {
   return (
     <>
       {!isLoading ? (
@@ -39,10 +33,10 @@ const PlayerProfileTab = ({
                   )}
 
                   {typeof v.value === 'string' &&
-                    v.data_type !== 'instagram_profile' &&
-                    v.data_type !== 'twitter_profile' &&
-                    v.data_type !== 'official_website' &&
-                    v.data_type !== 'facebook_profile' ? (
+                  v.data_type !== 'instagram_profile' &&
+                  v.data_type !== 'twitter_profile' &&
+                  v.data_type !== 'official_website' &&
+                  v.data_type !== 'facebook_profile' ? (
                     <Text
                       color="coolGray.600"
                       _dark={{
@@ -58,23 +52,23 @@ const PlayerProfileTab = ({
                         v.data_type === 'instagram_profile'
                           ? `https://www.instagram.com/${v.value}`
                           : v.data_type === 'twitter_profile'
-                            ? `https://twitter.com/${v.value}`
-                            : v.data_type === 'facebook_profile'
-                              ? `https://www.facebook.com/${v.value}`
-                              : v.data_type === 'official_website'
-                                ? v.value
-                                : null
+                          ? `https://twitter.com/${v.value}`
+                          : v.data_type === 'facebook_profile'
+                          ? `https://www.facebook.com/${v.value}`
+                          : v.data_type === 'official_website'
+                          ? v.value
+                          : null
                       }
                     >
                       {v.data_type === 'instagram_profile'
                         ? `https://www.instagram.com/${v.value}`
                         : v.data_type === 'twitter_profile'
-                          ? `https://twitter.com/${v.value}`
-                          : v.data_type === 'facebook_profile'
-                            ? `https://www.facebook.com/${v.value}`
-                            : v.data_type === 'official_website'
-                              ? v.value
-                              : null}
+                        ? `https://twitter.com/${v.value}`
+                        : v.data_type === 'facebook_profile'
+                        ? `https://www.facebook.com/${v.value}`
+                        : v.data_type === 'official_website'
+                        ? v.value
+                        : null}
                     </Link>
                   )}
                 </Container>
@@ -103,7 +97,7 @@ const PlayerProfileTab = ({
           )}
         </>
       ) : (
-        <Center py={padding}>
+        <Center py="25%">
           <HStack space={2} justifyContent="center">
             <Spinner color="blueGray.700" _dark={{ color: 'blueGray.200' }} />
             <Text

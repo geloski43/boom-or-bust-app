@@ -6,7 +6,7 @@ import {
   FormControl,
   WarningOutlineIcon,
 } from 'native-base';
-import { TouchableOpacity, Platform } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Context as PlayerContext } from '../../context/player-context';
 import PageProgress from '../../components/page-progress';
@@ -39,24 +39,16 @@ const PlayerSearchbar = ({
       direction="row"
       justifyContent={players.length > 0 ? 'space-between' : 'center'}
     >
-      <FormControl
-        isInvalid={playerSearchError}
-        w="55%"
-        maxW="300px"
-        h={playerSearchError ? '80px' : '46px'}
-      >
+      <FormControl isInvalid={playerSearchError} w="55%" maxW="300px">
         <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
           Please enter a name
         </FormControl.ErrorMessage>
         <Input
-          // only in ios
-          h={playerSearchError ? (Platform.OS === 'ios' ? '45px' : '') : '40px'}
+          h="38px"
           onSubmitEditing={() => {
             setPage(1);
             searchPlayerByName(query);
           }}
-          // only in ios
-          h={playerSearchError ? Platform.OS === "ios" ? '45px' : '' : "40px"}
           ref={inputRef}
           // this will prevent auto scroll top when the input is focused
           // instead move to index save to playerlistscrollposition state

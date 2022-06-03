@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Text, Stack, Checkbox, IconButton } from 'native-base';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { FontAwesome } from '@expo/vector-icons';
 import { Platform } from 'react-native';
-import { Context as LocalizationContext } from '../../context/localization-context';
 import PageProgress from '../../components/page-progress';
+import * as Localization from 'expo-localization';
 
 const GamelistFilter = ({
   hasPagination,
@@ -21,8 +21,7 @@ const GamelistFilter = ({
   showDatepicker,
   dateToSearch,
 }) => {
-  const localeContext = useContext(LocalizationContext);
-  const timeZone = localeContext.state.timezoneName;
+  const timeZone = Localization.timezone;
 
   return (
     <>

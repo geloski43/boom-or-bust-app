@@ -1,14 +1,13 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Text, Box, Image, Badge, Stack, Center, Icon } from 'native-base';
 import { dayToShow } from '../../utils/utils';
 import { Entypo } from '@expo/vector-icons';
-import { Context as LocalizationContext } from '../../context/localization-context';
 import BackButton from '../back-button';
 import { parseDate } from '../../utils/utils';
+import * as Localization from 'expo-localization';
 
 const GameDetails = ({ initialMount, game }) => {
-  const localeContext = useContext(LocalizationContext);
-  const timeZone = localeContext.state.timezoneName;
+  const timeZone = Localization.timezone;
 
   const opacity = (firstScore, secondScore) => {
     if (firstScore === secondScore) {

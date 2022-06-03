@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useContext } from 'react';
+import React, { useMemo, useCallback, useContext } from 'react';
 import {
   Text,
   Stack,
@@ -15,14 +15,15 @@ import {
   CheckIcon,
   Image,
   Skeleton,
+  useColorMode,
 } from 'native-base';
 import { Entypo } from '@expo/vector-icons';
-import { responsiveWidth, teamLogo } from '../../utils/utils';
+import { responsiveWidth, teamLogo, responsiveHeight } from '../../utils/utils';
 import { TouchableOpacity } from 'react-native';
 import { Context as StatsContext } from '../../context/stats-context';
 
 const PlayerAveragesTab = ({
-  allStats,
+  stats,
   groupedStats,
   season,
   isLoading,
@@ -31,99 +32,144 @@ const PlayerAveragesTab = ({
   subLoading,
   teamData,
   totalGamesPlayed,
-  colorMode,
+  averagesByTeamIndex,
+  setAveragesByTeamIndex,
 }) => {
   const statsContext = useContext(StatsContext);
   const avgTotals = statsContext.state.avgTotals;
-  const [index, setIndex] = useState(null);
+
+  const { colorMode } = useColorMode();
 
   // we select data if a player has  multiple teams in one season
   // by default we have total stats to display
   const selectedData = useCallback(() => {
-    if (index === null) {
-      return allStats;
+    if (averagesByTeamIndex === null) {
+      return stats;
     }
-    return groupedStats && groupedStats[index];
-  }, [allStats, groupedStats, index]);
+    return groupedStats && groupedStats[averagesByTeamIndex];
+  }, [stats, groupedStats, averagesByTeamIndex, season, isPostSeason]);
 
   // filter out invalid games so we get accurate values of games played
-  let voidGames = selectedData().filter(
-    (game) => game.min === null || game.min === '0:00' || game.min === ''
-  );
   // we convert min values from Min:Sec format to minutes only
-  let mins = selectedData().map((obj) => ({
-    convertedMins:
-      obj.min && obj.min.includes(':')
-        ? parseInt(obj.min.slice(0, 2)) + parseInt(obj.min.slice(-2)) / 60 || 0
-        : parseInt(obj.min) || 0,
-  }));
+  let mins =
+    selectedData() &&
+    selectedData().map((obj) => ({
+      convertedMins:
+        obj.min && obj.min.includes(':')
+          ? parseInt(obj.min.slice(0, 2)) + parseInt(obj.min.slice(-2)) / 60 ||
+            0
+          : parseInt(obj.min) || 0,
+    }));
   // we add teamlogo and teamid props,
   // teamid which we will use to group games by same team if a player has multiple teams in a season
-  let gameStats = selectedData().map((obj) => ({
-    ...obj,
-    teamLogo: teamLogo(obj.team.id, obj.team.full_name),
-    teamId: obj.team.id,
-  }));
+  let gameStats =
+    selectedData() &&
+    selectedData()
+      .filter(
+        (item) =>
+          item.min !== null &&
+          item.min !== '0:00' &&
+          item.min !== '' &&
+          item.min !== '0'
+      )
+      .map((obj) => ({
+        ...obj,
+        teamLogo: teamLogo(obj.team.id, obj.team.full_name),
+        teamId: obj.team.id,
+      }));
+
   // we will usee this to add team details in the accumulated totals object
-  let currentTeam = selectedData().map((obj) => ({
-    teamId: obj.team.id,
-    teamAbbr: obj.team.abbreviation,
-    teamFullName: obj.team.full_name,
-    teamLogo: teamLogo(obj.team.id, obj.team.full_name),
-  }));
+  let currentTeam =
+    selectedData() &&
+    selectedData().map((obj) => ({
+      teamId: obj.team.id,
+      teamAbbr: obj.team.abbreviation,
+      teamFullName: obj.team.full_name,
+      teamLogo: teamLogo(obj.team.id, obj.team.full_name),
+    }));
   // total games played
-  let totalGamesCount = selectedData().length - voidGames.length;
+  let totalGamesCount = selectedData() && selectedData().length;
   // accumulated totals
   let acccumulatedTotals = {
-    pts: selectedData().reduce(function (prev, cur) {
-      return prev + cur.pts;
-    }, 0),
-    reb: selectedData().reduce(function (prev, cur) {
-      return prev + cur.reb;
-    }, 0),
-    ast: selectedData().reduce(function (prev, cur) {
-      return prev + cur.ast;
-    }, 0),
-    blk: selectedData().reduce(function (prev, cur) {
-      return prev + cur.blk;
-    }, 0),
-    turnover: selectedData().reduce(function (prev, cur) {
-      return prev + cur.turnover;
-    }, 0),
-    stl: selectedData().reduce(function (prev, cur) {
-      return prev + cur.stl;
-    }, 0),
+    pts:
+      selectedData() &&
+      selectedData().reduce(function (prev, cur) {
+        return prev + cur.pts;
+      }, 0),
+    reb:
+      selectedData() &&
+      selectedData().reduce(function (prev, cur) {
+        return prev + cur.reb;
+      }, 0),
+    ast:
+      selectedData() &&
+      selectedData().reduce(function (prev, cur) {
+        return prev + cur.ast;
+      }, 0),
+    blk:
+      selectedData() &&
+      selectedData().reduce(function (prev, cur) {
+        return prev + cur.blk;
+      }, 0),
+    turnover:
+      selectedData() &&
+      selectedData().reduce(function (prev, cur) {
+        return prev + cur.turnover;
+      }, 0),
+    stl:
+      selectedData() &&
+      selectedData().reduce(function (prev, cur) {
+        return prev + cur.stl;
+      }, 0),
 
-    fga: selectedData().reduce(function (prev, cur) {
-      return prev + cur.fga;
-    }, 0),
-    fgm: selectedData().reduce(function (prev, cur) {
-      return prev + cur.fgm;
-    }, 0),
+    fga:
+      selectedData() &&
+      selectedData().reduce(function (prev, cur) {
+        return prev + cur.fga;
+      }, 0),
+    fgm:
+      selectedData() &&
+      selectedData().reduce(function (prev, cur) {
+        return prev + cur.fgm;
+      }, 0),
 
-    fg3a: selectedData().reduce(function (prev, cur) {
-      return prev + cur.fg3a;
-    }, 0),
-    fg3m: selectedData().reduce(function (prev, cur) {
-      return prev + cur.fg3m;
-    }, 0),
+    fg3a:
+      selectedData() &&
+      selectedData().reduce(function (prev, cur) {
+        return prev + cur.fg3a;
+      }, 0),
+    fg3m:
+      selectedData() &&
+      selectedData().reduce(function (prev, cur) {
+        return prev + cur.fg3m;
+      }, 0),
 
-    fta: selectedData().reduce(function (prev, cur) {
-      return prev + cur.fta;
-    }, 0),
-    ftm: selectedData().reduce(function (prev, cur) {
-      return prev + cur.ftm;
-    }, 0),
+    fta:
+      selectedData() &&
+      selectedData().reduce(function (prev, cur) {
+        return prev + cur.fta;
+      }, 0),
+    ftm:
+      selectedData() &&
+      selectedData().reduce(function (prev, cur) {
+        return prev + cur.ftm;
+      }, 0),
 
-    pf: selectedData().reduce(function (prev, cur) {
-      return prev + cur.pf;
-    }, 0),
-    oreb: selectedData().reduce(function (prev, cur) {
-      return prev + cur.oreb;
-    }, 0),
-    dreb: selectedData().reduce(function (prev, cur) {
-      return prev + cur.dreb;
-    }, 0),
+    pf:
+      selectedData() &&
+      selectedData().reduce(function (prev, cur) {
+        return prev + cur.pf;
+      }, 0),
+    oreb:
+      selectedData() &&
+      selectedData().reduce(function (prev, cur) {
+        return prev + cur.oreb;
+      }, 0),
+    dreb:
+      selectedData() &&
+      selectedData().reduce(function (prev, cur) {
+        return prev + cur.dreb;
+      }, 0),
     min:
       mins &&
       mins.reduce(function (prev, cur) {
@@ -148,16 +194,17 @@ const PlayerAveragesTab = ({
                 game.team.id === team.teamId &&
                 game.min !== null &&
                 game.min !== '0:00' &&
-                game.min !== ''
+                game.min !== '' &&
+                game.min !== '0'
             ).length,
           };
         }),
   };
 
   // this is the final data we will use to display in the table
-  // if index, allStats and groupedState changes table values will update
+  // if index, stats and groupedState changes table values will update
   const dataArray = useMemo(() => {
-    if (selectedData().length === 0) {
+    if (selectedData() && selectedData().length === 0) {
       return [];
     } else {
       return [
@@ -169,9 +216,7 @@ const PlayerAveragesTab = ({
         },
       ];
     }
-  }, [index, allStats, groupedStats]);
-
-  const padding = dataArray.length > 0 ? '0%' : '25%';
+  }, [stats, groupedStats, averagesByTeamIndex, season, isPostSeason]);
 
   const Placeholder = () => {
     return (
@@ -230,50 +275,60 @@ const PlayerAveragesTab = ({
         {!subLoading ? (
           <>
             <Stack mt="10" ml="45px" direction="column" space={1}>
-              {teamData.map((team, indx) => (
-                <TouchableOpacity
-                  key={team.teamId}
-                  onPress={() => setIndex(indx)}
-                  style={{ width: responsiveWidth(35) }}
-                >
-                  <Stack
-                    _dark={{ borderColor: 'coolGray.500' }}
-                    borderColor="coolGray.400"
-                    borderWidth="1"
-                    borderRadius="lg"
-                    bg={
-                      index === indx || teamData.length === 1
-                        ? colorMode === 'dark'
-                          ? 'amber.900'
-                          : 'amber.400'
-                        : 'transparent'
+              {teamData
+                .filter((v) => v.totalGamesPlayed !== 0)
+                .map((team, indx) => (
+                  <TouchableOpacity
+                    disabled={
+                      averagesByTeamIndex === indx ||
+                      teamData.filter((v) => v.totalGamesPlayed !== 0)
+                        .length === 1
                     }
-                    direction="row"
-                    space={3}
+                    key={team.teamId}
+                    onPress={() => setAveragesByTeamIndex(indx)}
+                    style={{ width: responsiveWidth(35) }}
                   >
-                    <Image
-                      bg="blueGray.100"
-                      borderRadius="full"
-                      size={'6'}
-                      resizeMode={'contain'}
-                      source={{ uri: team.teamLogo }}
-                      alt="team logo"
-                    />
-                    <Text
-                      alignSelf="flex-end"
-                      fontSize="14px"
-                      fontFamily="Oswald-Regular"
+                    <Stack
+                      _dark={{ borderColor: 'coolGray.500' }}
+                      borderColor="coolGray.400"
+                      borderWidth="1"
+                      borderRadius="lg"
+                      bg={
+                        averagesByTeamIndex === indx ||
+                        teamData.filter((v) => v.totalGamesPlayed !== 0)
+                          .length === 1
+                          ? colorMode === 'dark'
+                            ? 'amber.900'
+                            : 'amber.400'
+                          : 'transparent'
+                      }
+                      direction="row"
+                      space={3}
                     >
-                      {team.teamAbbr} ({team.totalGamesPlayed}{' '}
-                      {team.totalGamesPlayed === 1 ? 'game' : 'games'})
-                    </Text>
-                  </Stack>
-                </TouchableOpacity>
-              ))}
-              {teamData.length > 1 && (
+                      <Image
+                        bg="blueGray.100"
+                        borderRadius="full"
+                        size={'6'}
+                        resizeMode={'contain'}
+                        source={team.teamLogo}
+                        alt="team logo"
+                      />
+                      <Text
+                        alignSelf="flex-end"
+                        fontSize="14px"
+                        fontFamily="Oswald-Regular"
+                      >
+                        {team.teamAbbr} ({team.totalGamesPlayed}{' '}
+                        {team.totalGamesPlayed === 1 ? 'game' : 'games'})
+                      </Text>
+                    </Stack>
+                  </TouchableOpacity>
+                ))}
+              {teamData.filter((v) => v.totalGamesPlayed !== 0).length > 1 && (
                 <TouchableOpacity
+                  disabled={averagesByTeamIndex === null}
                   style={{ width: responsiveWidth(35) }}
-                  onPress={() => setIndex(null)}
+                  onPress={() => setAveragesByTeamIndex(null)}
                 >
                   <Stack
                     _dark={{ borderColor: 'coolGray.500' }}
@@ -281,7 +336,7 @@ const PlayerAveragesTab = ({
                     borderWidth="1"
                     borderRadius="lg"
                     bg={
-                      index === null
+                      averagesByTeamIndex === null
                         ? colorMode === 'dark'
                           ? 'amber.900'
                           : 'amber.400'
@@ -429,7 +484,7 @@ const PlayerAveragesTab = ({
     return (
       <>
         {!initialMount && !isLoading && (
-          <Stack py={padding}>
+          <Stack py="25%">
             <Stack direction="row" justifyContent="center" space={2}>
               <WarningOutlineIcon mt="1" size="xs" color="red.400" />
               <Text fontSize="15px" fontFamily="Oswald-Regular" color="red.400">
@@ -442,7 +497,7 @@ const PlayerAveragesTab = ({
               fontFamily="Oswald-Regular"
               color="red.400"
             >
-              Set the season to get averages
+              Set the season to get averages.
             </Text>
           </Stack>
         )}
@@ -456,7 +511,7 @@ const PlayerAveragesTab = ({
         {!initialMount && dataArray.length > 0 && (
           <VStack
             alignSelf="flex-end"
-            mt={responsiveWidth(10)}
+            mt={responsiveHeight(2)}
             px={responsiveWidth(18)}
           >
             <Select
@@ -506,7 +561,7 @@ const PlayerAveragesTab = ({
           keyExtractor={(item, index) => index.toString()}
         />
       ) : (
-        <Center py={padding}>
+        <Center py="25%">
           <Placeholder />
         </Center>
       )}

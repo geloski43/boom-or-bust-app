@@ -10,8 +10,12 @@ export const getPlayers = async (page) =>
 export const getPlayer = async (id) =>
   await axios.get(`https://www.balldontlie.io/api/v1/players/${id}`);
 
-export const searchPlayer = async (query) =>
-  await axios.get(`https://www.balldontlie.io/api/v1/players?search=${query}`);
+export const searchPlayer = async (query, perPage) =>
+  await axios.get(
+    `https://www.balldontlie.io/api/v1/players?search=${query}${
+      perPage ? `&per_page=${perPage}` : ''
+    }`
+  );
 
 export const getAverages = async (season, playerId) =>
   await axios.get(
@@ -41,3 +45,14 @@ export const getGame = async (id) =>
 
 export const searchGameByDate = async (date) =>
   await axios.get(`https://www.balldontlie.io/api/v1/games?dates[]=${date}`);
+
+export const comparePlayerStats = async (
+  page,
+  season,
+  playerOneId,
+  playerTwoId,
+  isPostSeason
+) =>
+  await axios.get(
+    `https://www.balldontlie.io/api/v1/stats?seasons[]=${season}&player_ids[]=${playerOneId}&player_ids[]=${playerTwoId}&postseason=${isPostSeason}&page=${page}&per_page=100`
+  );

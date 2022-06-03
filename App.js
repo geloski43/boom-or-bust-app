@@ -6,6 +6,8 @@ import { LogBox } from 'react-native';
 
 export default function App() {
   LogBox.ignoreLogs(['NativeBase:']);
+  LogBox.ignoreLogs(['Warning: ...']);
+
   const fontsLoaded = useCachedResources();
 
   return (

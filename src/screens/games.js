@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useContext } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { getGames, searchGameByDate } from '../api/ball-dont-lie-api';
 import ScreenContainer from '../components/screen-container';
 import bballGame from '../assets/images/bball-game.jpg';
@@ -6,11 +6,10 @@ import GameList from '../components/games/game-list';
 import { GamesPlaceholder } from '../components/placeholders';
 import { teamLogo, parseDate } from '../utils/utils';
 import GamelistFilter from '../components/games/game-list-filter';
-import { Context as LocalizationContext } from '../context/localization-context';
+import * as Localization from 'expo-localization';
 
 const Games = ({ navigation }) => {
-  const localeContext = useContext(LocalizationContext);
-  const timeZone = localeContext.state.timezoneName;
+  const timeZone = Localization.timezone;
 
   const [games, setGames] = useState([]);
   const [isFetchingMore, setIsFetchingMore] = useState(false);

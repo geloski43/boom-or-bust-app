@@ -3,7 +3,7 @@ import { getTeam } from '../api/ball-dont-lie-api';
 import { getInfo } from '../api/web-search-api';
 import ScreenContainer from '../components/screen-container';
 import bballCourt from '../assets/images/bball-court.jpg';
-import { teamsLogo } from '../constants/teams-logo';
+import { localTeamData } from '../constants/local-team-data';
 import TeamProfile from '../components/team/team-profile';
 import { TeamPlaceholder } from '../components/placeholders';
 
@@ -21,7 +21,9 @@ const Team = ({ route, navigation }) => {
     let basic = {};
     getTeam(itemId)
       .then((team) => {
-        const matchedLogo = teamsLogo.find((logo) => logo.id === team.data.id);
+        const matchedLogo = localTeamData.find(
+          (logo) => logo.id === team.data.id
+        );
         basic = { ...team.data, logo: matchedLogo.logo };
         setTeamBasicInfo(basic);
         setIsLoading(false);

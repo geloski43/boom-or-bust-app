@@ -29,155 +29,185 @@ import RaptorsLogo from '../assets/images/Raptors.png';
 import JazzLogo from '../assets/images/Jazz.png';
 import WizardsLogo from '../assets/images/Wizards.png';
 
-export const teamsLogo = [
+export const localTeamData = [
   {
     id: 1,
     logo: HawksLogo,
     name: 'Hawks',
+    city: 'Atlanta',
   },
   {
     id: 2,
     logo: CelticsLogo,
     name: 'Celtics',
+    city: 'Boston',
   },
   {
     id: 3,
     logo: NetsLogo,
     name: 'Nets',
+    city: 'Brooklyn',
   },
   {
     id: 4,
     logo: HornetsLogo,
     name: 'Hornets',
+    city: 'Charlotte',
   },
   {
     id: 5,
     logo: BullsLogo,
     name: 'Bulls',
+    city: 'Chicago',
   },
   {
     id: 6,
     logo: CavaliersLogo,
     name: 'Cavaliers',
+    city: 'Cleveland',
   },
   {
     id: 7,
     logo: MavericksLogo,
     name: 'Mavericks',
+    city: 'Dallas',
   },
   {
     id: 8,
     logo: NuggetsLogo,
     name: 'Nuggets',
+    city: 'Denver',
   },
   {
     id: 9,
     logo: PistonsLogo,
     name: 'Pistons',
+    city: 'Detroit',
   },
   {
     id: 10,
     logo: WarriorsLogo,
     name: 'Warriors',
+    city: 'Golden State',
   },
   {
     id: 11,
     logo: RocketsLogo,
     name: 'Rockets',
+    city: 'Houston',
   },
   {
     id: 12,
     logo: PacersLogo,
     name: 'Pacers',
+    city: 'Indiana',
   },
   {
     id: 13,
     logo: ClippersLogo,
     name: 'Clippers',
+    city: 'LA',
   },
   {
     id: 14,
     logo: LakersLogo,
     name: 'Lakers',
+    city: 'Los Angeles',
   },
   {
     id: 15,
     logo: GrizzliesLogo,
     name: 'Grizzlies',
+    city: 'Memphis',
   },
   {
     id: 16,
     logo: HeatLogo,
     name: 'Heat',
+    city: 'Miami',
   },
   {
     id: 17,
     logo: BucksLogo,
     name: 'Bucks',
+    city: 'Milwaukee',
   },
   {
     id: 18,
     logo: WolvesLogo,
     name: 'Timberwolves',
+    city: 'Minnesota',
   },
   {
     id: 19,
     logo: PelicansLogo,
     name: 'Pelicans',
+    city: 'New Orleans',
   },
   {
     id: 20,
     logo: KnicksLogo,
     name: 'Knicks',
+    city: 'New York',
   },
   {
     id: 21,
     logo: ThunderLogo,
     name: 'Thunder',
+    city: 'Oklahoma City',
   },
   {
     id: 22,
     logo: MagicLogo,
     name: 'Magic',
+    city: 'Orlando',
   },
   {
     id: 23,
     logo: SixersLogo,
     name: '76ers',
+    city: 'Philadelphia',
   },
   {
     id: 24,
     logo: SunsLogo,
     name: 'Suns',
+    city: 'Phoenix',
   },
   {
     id: 25,
     logo: BlazersLogo,
     name: 'Trail Blazers',
+    city: 'Portland',
   },
   {
     id: 26,
     logo: KingsLogo,
     name: 'Kings',
+    city: 'Sacramento',
   },
   {
     id: 27,
     logo: SpursLogo,
     name: 'Spurs',
+    city: 'San Antonio',
   },
   {
     id: 28,
     logo: RaptorsLogo,
     name: 'Raptors',
+    city: 'Toronto',
   },
   {
     id: 29,
     logo: JazzLogo,
     name: 'Jazz',
+    city: 'Utah',
   },
   {
     id: 30,
     logo: WizardsLogo,
     name: 'Wizards',
+    city: 'Washington',
   },
 ];
