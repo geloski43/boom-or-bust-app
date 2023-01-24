@@ -11,12 +11,6 @@ const Masthead = ({ image, children }) => {
   return (
     <Box h={`${screenHeight * 0.17}px`} pb={5}>
       <Image
-        onLoad={(e) => {
-          e.target.onload = null;
-          setTimeout(() => {
-            setImageStatus('Loaded');
-          }, 100);
-        }}
         position="absolute"
         left={0}
         right={0}
@@ -24,13 +18,7 @@ const Masthead = ({ image, children }) => {
         w="full"
         h={`${screenHeight * 0.113}px`}
         resizeMode="cover"
-        source={
-          imageStatus === 'Loaded'
-            ? image
-            : {
-                uri: 'https://via.placeholder.com/32/BBC2CC/BBC2CC?text=.....',
-              }
-        }
+        source={image}
         alt="masthead image"
       />
 

@@ -50,21 +50,7 @@ const Header = ({
       </Animated.View>
       <Animated.View style={{ paddingHorizontal: 22, opacity: imageOpacity }}>
         <Animated.Image
-          onLoad={(e) => {
-            e.target.onload = null;
-            setTimeout(() => {
-              setImageStatus('Loaded');
-            }, 300);
-          }}
-          source={
-            imageStatus !== 'Loaded'
-              ? {
-                uri: 'https://via.placeholder.com/32/BBC2CC/BBC2CC?text=.....',
-              }
-              : {
-                uri: player && player.playerImage,
-              }
-          }
+          source={player.playerImage}
           style={[
             styles.headerPic,
             {
@@ -86,7 +72,7 @@ const Header = ({
         <Text
           style={{
             color: colorMode === 'dark' ? 'white' : 'black',
-            fontSize: responsiveWidth(5),
+            fontSize: 17,
             lineHeight: 24,
             letterSpacing: -1,
             fontFamily: 'Oswald-Regular',
@@ -101,16 +87,17 @@ const Header = ({
         }}
       >
         {renderSeasonOption('25', '22px', 'right top')}
-      </Animated.View >
-    </View >
+      </Animated.View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   headerPic: {
-    width: 32,
-    height: 32,
+    width: 52,
+    height: 52,
     borderRadius: 8,
+    marginTop: -15,
   },
 });
 

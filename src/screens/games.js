@@ -26,7 +26,7 @@ const Games = ({ navigation }) => {
 
   const gamelistRef = useRef();
   const moveToTop = () =>
-    gamelistRef.current && gamelistRef.current.scrollToTop({ animmated: true });
+    gamelistRef.current && gamelistRef.current.scrollToTop({ animated: true });
 
   // fetching game by date
   const fetchGameByDate = (selectedDate) => {

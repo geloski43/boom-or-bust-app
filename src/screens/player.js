@@ -358,7 +358,7 @@ const Player = ({ route, navigation }) => {
   // header parallax functions and variables and components
 
   const textColor = colorMode === 'dark' ? 'white' : 'black';
-  const lgTextSize = responsiveWidth(4);
+  const lgTextSize = 17;
   const headerHeight = ifIphoneX(92, responsiveHeight(13));
   const contentBackground = colorMode === 'dark' ? '#525252' : '#d6d3d1';
 

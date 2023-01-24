@@ -44,7 +44,7 @@ const PlayerSearchbar = ({
           Please enter a name
         </FormControl.ErrorMessage>
         <Input
-          h="38px"
+          h="45px"
           onSubmitEditing={() => {
             setPage(1);
             searchPlayerByName(query);

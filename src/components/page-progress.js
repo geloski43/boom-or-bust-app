@@ -5,6 +5,8 @@ import {
   ZStack,
   IconButton,
   PresenceTransition,
+  Center,
+  Icon,
 } from 'native-base';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { AntDesign } from '@expo/vector-icons';
@@ -22,6 +24,7 @@ const PageProgress = ({ progress, moveToTop }) => {
 
   return (
     <Stack
+      w="100px"
       my="1"
       px="2"
       borderRadius="sm"
@@ -29,6 +32,7 @@ const PageProgress = ({ progress, moveToTop }) => {
       _dark={{ bg: 'blueGray.800' }}
       direction="row"
       alignSelf="flex-end"
+      justifyContent="space-between"
     >
       <PresenceTransition
         alignSelf="center"
@@ -48,19 +52,23 @@ const PageProgress = ({ progress, moveToTop }) => {
       >
         <IconButton
           onPress={moveToTop}
-          _icon={{
-            as: AntDesign,
-            name: 'arrowup',
-            size: 'xs',
-            color: 'lightBlue.800',
-          }}
+          borderRadius="full"
+          icon={
+            <Icon
+              mt="5px"
+              ml="-10px"
+              as={AntDesign}
+              size="5"
+              name="arrowup"
+              color="lightBlue.800"
+            />
+          }
         />
       </PresenceTransition>
-      <ZStack mx="3" justifyContent="center" mb="-1" pt="1">
+      <ZStack mx="3" justifyContent="center" alignItems="center" mb="-1" pt="1">
         <Text
           alignSelf="center"
           bg="muted.300"
-          mt="8"
           fontSize="10px"
           fontFamily="Oswald-Bold"
           borderRadius="md"
@@ -70,7 +78,7 @@ const PageProgress = ({ progress, moveToTop }) => {
         </Text>
         <AnimatedCircularProgress
           size={38}
-          width={5}
+          width={2}
           backgroundWidth={5}
           fill={progress}
           tintColor="#00ff00"

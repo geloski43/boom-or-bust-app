@@ -69,7 +69,7 @@ export const GamePlaceholder = () => {
 export const GamesPlaceholder = () => {
   return (
     <>
-      <HStack justifyContent="space-around">
+      <HStack justifyContent="space-between">
         <Skeleton
           w="180px"
           px="1"
@@ -170,7 +170,7 @@ export const GamesPlaceholder = () => {
 export const PlayersPlaceholder = () => {
   return (
     <>
-      <HStack justifyContent="space-around">
+      <HStack justifyContent="space-between">
         <Skeleton
           w="180px"
           px="1"
@@ -188,10 +188,10 @@ export const PlayersPlaceholder = () => {
       </HStack>
       <Box alignItems="center">
         {Array.from(Array(4).keys()).map((v, i) => (
-          <Flex m="1" mx="2" h={170} key={i} direction="row">
+          <Flex m="1" mx="2" h={170} key={i} direction="row" w="100%">
             <Center
               m="1"
-              w="50%"
+              w="48%"
               rounded="sm"
               borderWidth="1"
               overflow="hidden"
@@ -222,7 +222,7 @@ export const PlayersPlaceholder = () => {
 
             <Center
               m="1"
-              w="50%"
+              w="47.8%"
               rounded="sm"
               borderWidth="1"
               overflow="hidden"
@@ -296,7 +296,7 @@ export const TeamPlaceholder = () => {
 export const TeamsPlaceholder = () => {
   return (
     <>
-      <HStack justifyContent="flex-end">
+      <HStack justifyContent="flex-start">
         <Skeleton
           w="150px"
           px="1"

@@ -274,7 +274,7 @@ const PlayerAveragesTab = ({
       <>
         {!subLoading ? (
           <>
-            <Stack mt="10" ml="45px" direction="column" space={1}>
+            <Stack mt="10" direction="column" space={1} alignItems="center">
               {teamData
                 .filter((v) => v.totalGamesPlayed !== 0)
                 .map((team, indx) => (

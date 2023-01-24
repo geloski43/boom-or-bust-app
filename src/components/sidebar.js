@@ -16,9 +16,8 @@ import {
 } from 'native-base';
 import ThemeToggle from './theme-toggle';
 import MenuButton from './menu-button';
-import { AntDesign } from '@expo/vector-icons';
 import logo from '../assets/images/logo.png';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome, Entypo, AntDesign } from '@expo/vector-icons';
 
 const Sidebar = (props) => {
   const { state, navigation } = props;
@@ -26,19 +25,14 @@ const Sidebar = (props) => {
 
   const icons = [
     {
-      name: 'envelope',
-      bg: 'red.600',
+      name: 'envelope-square',
+      color: 'red.600',
       href: 'mailto:ajgonzales43@gmail.com',
     },
     {
       name: 'github',
-      bg: 'coolGray.600',
+      color: 'coolGray.600',
       href: 'https://github.com/geloski43',
-    },
-    {
-      name: 'linkedin',
-      bg: 'blue.400',
-      href: 'https://www.linkedin.com/in/angelo-gonzales-6b58a0212',
     },
   ];
 
@@ -123,13 +117,11 @@ const Sidebar = (props) => {
         </MenuButton>
       </VStack>
       <Center>
-        <HStack>
+        <HStack space={3} pt="1" mt="27%">
           <Pressable _pressed={{ opacity: 0.6 }}>
             <Link href="https://geloski-portfolio.vercel.app/">
               <Avatar
-                mt="8px"
-                mr="8px"
-                size={31.5}
+                size="sm"
                 bg="coolGray.300"
                 source={{
                   uri: 'https://robohash.org/Kapitan%20Smiley?set=set2;size=100x100',
@@ -138,25 +130,28 @@ const Sidebar = (props) => {
             </Link>
           </Pressable>
           {icons.map((icon) => (
-            <IconButton
-              key={icon.name}
-              m={'8px'}
-              borderRadius="full"
-              bg={icon.bg}
-              variant="solid"
-              p="2"
-              icon={
-                <Link href={icon.href}>
-                  <Icon
-                    color="white"
-                    name={icon.name}
-                    as={FontAwesome5}
-                    size="xs"
-                  />
-                </Link>
-              }
-            />
+            <Pressable key={icon.name} _pressed={{ opacity: 0.6 }}>
+              <Link href={icon.href}>
+                <Icon
+                  size="9"
+                  as={FontAwesome}
+                  name={icon.name}
+                  color={icon.color}
+                />
+              </Link>
+            </Pressable>
           ))}
+
+          <Pressable _pressed={{ opacity: 0.6 }}>
+            <Link href="https://www.linkedin.com/in/angelo-gonzales-6b58a0212">
+              <Icon
+                size="9"
+                as={Entypo}
+                name="linkedin-with-circle"
+                color="blue.400"
+              />
+            </Link>
+          </Pressable>
         </HStack>
         <Text textAlign={'center'} fontSize="11px" fontWeight="extrabold">
           &copy; {new Date().getFullYear()} Boom or Bust™. All rights reserved.

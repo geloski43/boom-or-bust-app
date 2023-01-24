@@ -104,7 +104,7 @@ const TeamList = ({ data, toFilter, setToFilter, initialMount }) => {
     return (
       <>
         {!initialMount && (
-          <HStack mb="2" justifyContent="flex-end">
+          <HStack my="2" justifyContent="flex-start">
             <SelectTeams
               items={['All', 'East', 'West']}
               setSelected={setToFilter}

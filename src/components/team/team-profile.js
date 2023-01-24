@@ -36,7 +36,7 @@ const TeamProfile = ({ teamBasicInfo, teamDetailedInfo, initialMount }) => {
           }}
         >
           <Stack p="4" space={3}>
-            <VStack alignItems="flex-end">
+            <VStack>
               <Image
                 key={teamBasicInfo.city}
                 size="20"

@@ -21,7 +21,7 @@ const BackButton = ({ text, route }) => {
           color="warning.500"
           as={MaterialIcons}
           name="keyboard-backspace"
-          size="sm"
+          size="xl"
         />
       }
     >

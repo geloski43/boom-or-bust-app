@@ -483,7 +483,7 @@ const HeadToHead = ({ navigation }) => {
           isOpen={showPopover}
           onClose={() => setShowPopover(!showPopover)}
         >
-          <Popover.Content w="195px">
+          <Popover.Content w="56">
             <Popover.Arrow />
             <Popover.CloseButton onPress={() => setShowPopover(false)} />
             <Popover.Header>Season options</Popover.Header>
@@ -499,11 +499,11 @@ const HeadToHead = ({ navigation }) => {
                     Press icon to select players
                   </FormControl.ErrorMessage>
                   <NumericInput
-                    type="plus-minus"
+                    type="up-down"
                     value={season}
                     onChange={(value) => setSeason(value)}
-                    totalWidth={130}
-                    totalHeight={40}
+                    totalWidth={197}
+                    totalHeight={50}
                     step={1}
                     valueType="real"
                     rounded

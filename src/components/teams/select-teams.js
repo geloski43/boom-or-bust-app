@@ -10,7 +10,7 @@ const SelectTeams = ({
   objKey,
 }) => {
   return (
-    <VStack>
+    <VStack w="35%" pr="1">
       <Select
         dropdownIcon={<Icon name="chevron-small-down" as={Entypo} size="sm" />}
         shadow={2}

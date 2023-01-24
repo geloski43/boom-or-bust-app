@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Animated, StyleSheet } from 'react-native';
 import { responsiveWidth } from '../../utils/utils';
-import { Text, Skeleton, useColorMode } from 'native-base';
+import { Text, Skeleton, useColorMode, VStack } from 'native-base';
 
 const HeaderForeground = ({
   scrollPosition,
@@ -18,8 +18,8 @@ const HeaderForeground = ({
 }) => {
   const { colorMode } = useColorMode();
 
-  const lgTextSize = responsiveWidth(5);
-  const smallTextSize = responsiveWidth(4);
+  const lgTextSize = 22;
+  const smallTextSize = 16;
   const textColor = colorMode === 'dark' ? 'white' : 'black';
 
   const startSize = responsiveWidth(23);
@@ -87,7 +87,7 @@ const HeaderForeground = ({
 
   const renderAverages = () => {
     return (
-      <>
+      <VStack w="full" alignItems="flex-start">
         {averages &&
           averages.map((avg, indx) => {
             const tSPct = avg.pts / (2 * avg.fga + 0.88 * avg.fta);
@@ -143,7 +143,37 @@ const HeaderForeground = ({
               </Animated.View>
             );
           })}
-      </>
+        <Animated.View
+          style={{
+            width: '100%',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}
+        >
+          {!isLoading ? (
+            <Text
+              style={[
+                styles.altHeaderText,
+                {
+                  fontSize: smallTextSize,
+                  color: textColor,
+                },
+              ]}
+            >
+              {season}-{parseInt(season) + 1}{' '}
+              {isPostSeason ? 'Playoffs' : 'Reg. Season'}
+            </Text>
+          ) : (
+            <Skeleton.Text
+              startColor="warmGray.200"
+              m="1"
+              lines={1}
+              w="105px"
+            />
+          )}
+          {renderSeasonOption('30', '-12px', 'right bottom')}
+        </Animated.View>
+      </VStack>
     );
   };
 
@@ -231,7 +261,13 @@ const HeaderForeground = ({
           {!isLoading ? (
             <>
               {gamesPlayed === 0 ? (
-                <Animated.View>
+                <Animated.View
+                  style={{
+                    width: '100%',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}
+                >
                   <Text
                     style={{
                       lineHeight: 20,
@@ -241,6 +277,7 @@ const HeaderForeground = ({
                   >
                     No game logs available
                   </Text>
+                  {renderSeasonOption('30', '-12px', 'right bottom')}
                 </Animated.View>
               ) : (
                 renderAverages()
@@ -249,38 +286,6 @@ const HeaderForeground = ({
           ) : (
             <Placeholder />
           )}
-          <Animated.View
-            style={{
-              paddingRight: responsiveWidth(2),
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent:
-                averages.length !== 0 ? 'space-around' : 'space-between',
-            }}
-          >
-            {!isLoading ? (
-              <Text
-                style={[
-                  styles.altHeaderText,
-                  {
-                    fontSize: smallTextSize,
-                    color: textColor,
-                  },
-                ]}
-              >
-                {season}-{parseInt(season) + 1}{' '}
-                {isPostSeason ? 'Playoffs' : 'Reg. Season'}
-              </Text>
-            ) : (
-              <Skeleton.Text
-                startColor="warmGray.200"
-                m="1"
-                lines={1}
-                w="105px"
-              />
-            )}
-            {renderSeasonOption('30', '-12px', 'right bottom')}
-          </Animated.View>
         </>
       </Animated.View>
     </View>
